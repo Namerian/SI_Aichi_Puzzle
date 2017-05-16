@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyFollowing : MonoBehaviour {
+public class EnemyFollowing : Enemy {
 
     NavMeshAgent agent;
     public GameObject target;
-    public bool isBoss;
 
     void Awake()
     {
@@ -17,7 +16,8 @@ public class EnemyFollowing : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	}
+        LevelManager.Instance.enemiesFollowing.Add(this);
+    }
 	
 	// Update is called once per frame
 	void Update () {

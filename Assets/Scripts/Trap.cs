@@ -5,11 +5,12 @@ using UnityEngine;
 public class Trap : MonoBehaviour {
 
 	
-	void OnCollisionEnter(Collision c)
+	void OnTriggerEnter(Collider c)
     {
-        if(c.collider.gameObject.GetComponent<EnemyFollowing>() || c.collider.gameObject.GetComponent<EnemyWaiting>())
+        if(c.gameObject.GetComponent<EnemyFollowing>() || c.gameObject.GetComponent<EnemyWaiting>())
         {
             Destroy(c.gameObject);
+            Destroy(gameObject);
             //FX
         }
     }
