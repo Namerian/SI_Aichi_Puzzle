@@ -7,6 +7,7 @@ public class EnemyFollowing : MonoBehaviour {
 
     NavMeshAgent agent;
     public GameObject target;
+    public bool isBoss;
 
     void Awake()
     {
