@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 public class UiCardButton : MonoBehaviour
 {
+    [SerializeField]
+    private Image _image;
+
     private Card _card = null;
 
     public Card Card { get { return _card; } }
@@ -21,5 +24,10 @@ public class UiCardButton : MonoBehaviour
     public void Initialize(Card card)
     {
         _card = card;
+    }
+
+    public void SetSelectionColor(Color color)
+    {
+        _image.color = color;
     }
 }
