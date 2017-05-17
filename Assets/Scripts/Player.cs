@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    //=================================================================
+    // Variables - editor
+    //=================================================================
+
     [SerializeField]
     private string _name = "PlayerA";
 
@@ -16,16 +20,31 @@ public class Player : MonoBehaviour
     [SerializeField]
     private Rigidbody _rigidbody;
 
-<<<<<<< HEAD
+    [SerializeField]
+    private GameObject _trapPrefab;
+
+    [SerializeField]
+    private List<Card> _cards = new List<Card>();
+
+    [SerializeField]
+    private float _kyoiPoints = 0;
+
+    //=================================================================
+    // Variables - private
+    //=================================================================
+
     private bool _stopped = false;
     private Vector3 _lastRotation;
-=======
-    public GameObject trapPrefab;
-    public List<Card> cards = new List<Card>();
-    public float kyoiPoints = 0;
 
+    //=================================================================
+    // Properties
+    //=================================================================
 
->>>>>>> rooki
+    public float KyoiPoints { get { return _kyoiPoints; } }
+
+    //=================================================================
+    // Monobehaviour
+    //=================================================================
 
     // Use this for initialization
     void Start()
@@ -40,22 +59,20 @@ public class Player : MonoBehaviour
         ActionInputs();
     }
 
-    void DirectionInputs()
+    //=================================================================
+    // Private Methods
+    //=================================================================
+
+    private void DirectionInputs()
     {
         float axisY = Input.GetAxis(_name + "_AxisY");
         float axisX = Input.GetAxis(_name + "_AxisX");
 
-<<<<<<< HEAD
-        if (_stopped)
-=======
-        _rigidbody.velocity = this.transform.forward * _speed;
 
-        if (axisY > 0)
->>>>>>> rooki
+        if (_stopped)
         {
-            _rigidbody.velocity = Vector3.zero;
+            _rigidbody.velocity = this.transform.forward * _speed;
         }
-<<<<<<< HEAD
         else
         {
             _rigidbody.velocity = this.transform.forward * _speed;
@@ -91,17 +108,6 @@ public class Player : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.collider.CompareTag("Wall"))
-=======
-        else if (axisX > 0)
-        {
-            this.transform.localEulerAngles = new Vector3(0, 90, 0);
-        }
-        else if (axisY < 0)
-        {
-            this.transform.localEulerAngles = new Vector3(0, 180, 0);
-        }
-        else if (axisX < 0)
->>>>>>> rooki
         {
             //Debug.Log("ttttttttttttttttttt");
 
@@ -112,7 +118,40 @@ public class Player : MonoBehaviour
 
             Invoke("StartMoving", _stopTime);
         }
-<<<<<<< HEAD
+        else if (collision.collider.CompareTag("Enemy"))
+        {
+            Enemy e = collision.collider.GetComponent<Enemy>();
+
+            if (e.isBoss) //boss
+            {
+                if (_cards[0].cardName == CardsName.attackBig)
+                {
+                    Destroy(e.gameObject);
+                    RemoveCurrentCard();
+                }
+                else
+                {
+                    print("TU MEURS");
+                }
+            }
+            else //non boss
+            {
+                if (_cards[0].cardName == CardsName.attack)
+                {
+                    Destroy(e.gameObject);
+                    RemoveCurrentCard();
+                }
+                else if (_cards[0].cardName == CardsName.defence)
+                {
+                    RemoveCurrentCard();
+                }
+                else
+                {
+                    print("TU MEURS");
+                    RemoveCurrentCard();
+                }
+            }
+        }
     }
 
     private void StartMoving()
@@ -120,67 +159,24 @@ public class Player : MonoBehaviour
         //Debug.Log("rrrrr");
         _stopped = false;
     }
-}
-=======
-    }
 
-    void ActionInputs()
+    private void ActionInputs()
     {
-        if (Input.GetButton(_name + "_Action") && cards[0].cardName == CardsName.trap)
+        if (Input.GetButton(_name + "_Action") && _cards[0].cardName == CardsName.trap)
         {
-            GameObject trap = Instantiate(trapPrefab);
+            GameObject trap = Instantiate(_trapPrefab);
             trap.transform.position = transform.position;
-            if(cards[0].cardName == CardsName.trap) RemoveCurrentCard();
+            if (_cards[0].cardName == CardsName.trap) RemoveCurrentCard();
         }
     }
 
-    void OnCollisionEnter(Collision c)
-    {
-        Enemy e = c.collider.GetComponent<Enemy>();
-        if(e != null)
-        {
-            if (e.isBoss) //boss
-            {
-                if (cards[0].cardName == CardsName.attackBig)
-                {
-                    Destroy(e.gameObject);
-                    RemoveCurrentCard();
-                }
-                else
-                {
-                    print("TU MEURS");
-                }
-
-            }
-            else //non boss
-            {
-                if (cards[0].cardName == CardsName.attack)
-                {
-                    Destroy(e.gameObject);
-                    RemoveCurrentCard();
-                }
-                else if (cards[0].cardName == CardsName.defence)
-                {
-                    RemoveCurrentCard();
-                }
-                else
-                {
-                    print("TU MEURS");
-                    RemoveCurrentCard();
-                }
-            }
-        }
-    }
-
-    void CheckCard()
+    private void CheckCard()
     {
 
     }
 
-    void RemoveCurrentCard()
+    private void RemoveCurrentCard()
     {
-        cards.RemoveAt(0);
+        _cards.RemoveAt(0);
     }
-
 }
->>>>>>> rooki

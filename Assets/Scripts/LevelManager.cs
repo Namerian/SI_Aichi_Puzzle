@@ -28,24 +28,24 @@ public class LevelManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        print(((-players[0].kyoiPoints / 2 + players[1].kyoiPoints / 2) / 100));
-        kyoiSlider.value = .5f + ((-players[0].kyoiPoints / 2 + players[1].kyoiPoints / 2) / 100);
+        print(((-players[0].KyoiPoints / 2 + players[1].KyoiPoints / 2) / 100));
+        kyoiSlider.value = .5f + ((-players[0].KyoiPoints / 2 + players[1].KyoiPoints / 2) / 100);
         SplitEnnemies();
     }
 
     void SplitEnnemies()
     {
         float num;
-        if(players[0].kyoiPoints > players[1].kyoiPoints)
+        if(players[0].KyoiPoints > players[1].KyoiPoints)
         {
-            num = 50 + (players[0].kyoiPoints - players[1].kyoiPoints);
+            num = 50 + (players[0].KyoiPoints - players[1].KyoiPoints);
             SetEnnemiesTarget(players[0], players[1], num);
         }
         else
         {
-            if (players[1].kyoiPoints > players[0].kyoiPoints)
+            if (players[1].KyoiPoints > players[0].KyoiPoints)
             {
-                num = 50 + (players[1].kyoiPoints - players[0].kyoiPoints);
+                num = 50 + (players[1].KyoiPoints - players[0].KyoiPoints);
                 SetEnnemiesTarget(players[1], players[0], num);
             }
         }
