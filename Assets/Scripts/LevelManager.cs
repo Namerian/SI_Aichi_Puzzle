@@ -14,12 +14,13 @@ public class LevelManager : MonoBehaviour
 
     public List<EnemyFollowing> enemiesFollowing = new List<EnemyFollowing>();
 
+    public float _kyoiSliderValue = 0.5f;
+
     //=================================================================
     // Variables - private
     //=================================================================
 
     private List<Player> _players = new List<Player>();
-    private float _kyoiSliderValue = 0.5f;
 
     //=================================================================
     // Monobehaviour Methods

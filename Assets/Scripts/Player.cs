@@ -18,6 +18,9 @@ public class Player : MonoBehaviour
     private float _stopTime = 0.8f;
 
     [SerializeField]
+    private float _trailMaxLength;
+
+    [SerializeField]
     private Rigidbody _rigidbody;
 
     //[SerializeField]
@@ -32,7 +35,16 @@ public class Player : MonoBehaviour
 
     private bool _stopped = false;
     private Vector3 _lastRotation;
+    [SerializeField]
     private float _kyoiPoints = 0;
+    private TrailRenderer trailRenderer;
+    [SerializeField]
+    private GameObject ennemiesFollowingPrefab;
+    private Vector3 _ennemiesBounds;
+    [SerializeField]
+    private List<GameObject> ennemiesFollowing = new List<GameObject>();
+    [SerializeField]
+    private Vector3[] trailPositions;
 
     //=================================================================
     // Properties
@@ -47,10 +59,12 @@ public class Player : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        //GameObject firstFollowing = Instantiate(ennemiesFollowingPrefab);
+        //ennemiesFollowing.Add(firstFollowing);
+        _ennemiesBounds = ennemiesFollowingPrefab.GetComponentInChildren<Renderer>().bounds.size;
         LevelManager.Instance.RegisterPlayer(this);
-
+        trailRenderer = GetComponent<TrailRenderer>();
         _lastRotation = new Vector3(0, 90, 0);
-
         ShowCardsInUi();
     }
 
@@ -58,12 +72,23 @@ public class Player : MonoBehaviour
     void Update()
     {
         DirectionInputs();
+        SetTrailTime();
+        CreateFollowingEnnemies();
+        trailPositions = new Vector3[trailRenderer.positionCount];
+        trailRenderer.GetPositions(trailPositions);
+        if (ennemiesFollowing.Count > 0) UpdateTrail();
         //ActionInputs();
     }
 
     //=================================================================
     // Private Methods
     //=================================================================
+
+    private void SetTrailTime()
+    {
+        if (_name == "PlayerA") trailRenderer.time = _trailMaxLength * ((100 - LevelManager.Instance._kyoiSliderValue * 100) / 100);
+        else trailRenderer.time = _trailMaxLength * LevelManager.Instance._kyoiSliderValue;
+    }
 
     private void DirectionInputs()
     {
@@ -193,4 +218,33 @@ public class Player : MonoBehaviour
 
         GameUiManager.Instance.IngameUi.SetPlayerCards(_name, currentCardSprite, nextCardSprite);
     }
+
+    void CreateFollowingEnnemies()
+    {
+        if(trailRenderer.positionCount * trailRenderer.minVertexDistance > ennemiesFollowing.Count * _ennemiesBounds.z)
+        {
+            ennemiesFollowing.Add(Instantiate(ennemiesFollowingPrefab));
+            print("EF" + ennemiesFollowing.Count);
+        }
+        /*
+        if(ennemiesFollowing.Count * _ennemiesBounds.z > trailRenderer.positionCount * trailRenderer.minVertexDistance)
+        {
+            if (ennemiesFollowing[ennemiesFollowing.Count - 1] != null)
+            {
+                ennemiesFollowing.RemoveAt(ennemiesFollowing.Count - 1);
+                Destroy(ennemiesFollowing[ennemiesFollowing.Count - 1]);
+            }
+        }
+        */
+    }
+
+    void UpdateTrail()
+    {
+        for (int i = 0; i < ennemiesFollowing.Count; i++)
+        {
+            //ennemiesFollowing[i].transform.position = trailRenderer.GetPosition(trailRenderer.positionCount - (i + 1 * trailRenderer.positionCount)); //trailRenderer.GetPosition(i); 
+            ennemiesFollowing[i].transform.position = trailPositions[(trailPositions.Length - 1) - (i * (trailPositions.Length / ennemiesFollowing.Count))];
+        }
+    }
+
 }
