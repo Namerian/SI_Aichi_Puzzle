@@ -16,8 +16,6 @@ public class GameOverPanel : MonoBehaviour
         _canvasGroup.alpha = 0;
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
-
-        GameUiManager.Instance.EventSystem.firstSelectedGameObject = _selectedButton;
     }
 
     public void Activate()
@@ -26,7 +24,7 @@ public class GameOverPanel : MonoBehaviour
         _canvasGroup.interactable = true;
         _canvasGroup.blocksRaycasts = true;
 
-
+        GameUiManager.Instance.EventSystem.firstSelectedGameObject = _selectedButton;
     }
 
     public void OnReloadButtonPressed()

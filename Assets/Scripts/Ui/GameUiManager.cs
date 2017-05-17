@@ -32,6 +32,19 @@ public class GameUiManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        if(!_ingameUi.gameObject.activeSelf)
+        {
+            _ingameUi.gameObject.SetActive(true);
+        }
+
+        if(!_gameOverPanel.gameObject.activeSelf)
+        {
+            _gameOverPanel.gameObject.SetActive(true);
+        }
+    }
+
     public void ActivateGameOverPanel()
     {
         _gameOverPanel.Activate();

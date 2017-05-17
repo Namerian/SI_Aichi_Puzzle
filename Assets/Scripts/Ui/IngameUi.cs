@@ -30,12 +30,44 @@ public class IngameUi : MonoBehaviour
         switch (playerName)
         {
             case "PlayerA":
-                _currentCardPlayerA.sprite = currentCardSprite;
-                _nextCardPlayerA.sprite = nextCardSprite;
+                if (currentCardSprite)
+                {
+                    _currentCardPlayerA.sprite = currentCardSprite;
+                }
+                else
+                {
+                    _currentCardPlayerA.color = Color.clear;
+                }
+
+                if (nextCardSprite)
+                {
+                    _nextCardPlayerA.sprite = nextCardSprite;
+                }
+                else
+                {
+                    _nextCardPlayerA.color = Color.clear;
+                }
+
                 break;
             case "PlayerB":
-                _currentCardPlayerB.sprite = currentCardSprite;
-                _nextCardPlayerB.sprite = nextCardSprite;
+                if (currentCardSprite)
+                {
+                    _currentCardPlayerB.sprite = currentCardSprite;
+                }
+                else
+                {
+                    _currentCardPlayerB.color = Color.clear;
+                }
+
+                if (nextCardSprite)
+                {
+                    _nextCardPlayerB.sprite = nextCardSprite;
+                }
+                else
+                {
+                    _nextCardPlayerB.color = Color.clear;
+                }
+
                 break;
         }
     }
