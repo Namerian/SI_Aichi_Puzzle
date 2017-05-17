@@ -12,4 +12,9 @@ public class Enemy : MonoBehaviour
 
     public bool IsBoss { get { return _isBoss; } }
     public EnemyType Type { get { return _type; } }
+
+    private void Start()
+    {
+        LevelManager.Instance.RegisterEnemy(this);
+    }
 }

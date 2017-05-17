@@ -19,6 +19,8 @@ public class LevelManager : MonoBehaviour
     //=================================================================
 
     private Player[] _players = new Player[2];
+    private List<Enemy> _enemies = new List<Enemy>();
+    private List<Teleporter> _teleporters = new List<Teleporter>();
     private float _kyoiSliderValue = 0.5f;
 
     //=================================================================
@@ -61,10 +63,34 @@ public class LevelManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //check for defeat
         if(!IsGamePaused && _players[0].IsDead && _players[1].IsDead)
         {
             IsGamePaused = true;
             GameUiManager.Instance.ActivateGameOverPanel();
+        }
+
+        //check for victory
+        if(!IsGamePaused)
+        {
+            bool allEnemiesDead = true;
+
+            foreach(Enemy enemy in _enemies)
+            {
+                if(enemy.gameObject.activeSelf)
+                {
+                    allEnemiesDead = false;
+                    break;
+                }
+            }
+
+            if(allEnemiesDead)
+            {
+                foreach(Teleporter teleporter in _teleporters)
+                {
+                    teleporter.Activate();
+                }
+            }
         }
 
         //print(((-players[0].KyoiPoints / 2 + players[1].KyoiPoints / 2) / 100));
@@ -92,6 +118,22 @@ public class LevelManager : MonoBehaviour
             case "PlayerB":
                 _players[1] = player;
                 break;
+        }
+    }
+
+    public void RegisterEnemy(Enemy enemy)
+    {
+        if(!_enemies.Contains(enemy))
+        {
+            _enemies.Add(enemy);
+        }
+    }
+
+    public void RegisterTeleporter(Teleporter teleporter)
+    {
+        if(!_teleporters.Contains(teleporter))
+        {
+            _teleporters.Add(teleporter);
         }
     }
 

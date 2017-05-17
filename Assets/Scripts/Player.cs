@@ -142,7 +142,7 @@ public class Player : MonoBehaviour
                 switch (result)
                 {
                     case CardResult.PlayerVictory:
-                        Destroy(enemy.gameObject);
+                        enemy.gameObject.SetActive(false);
                         break;
                     case CardResult.EnemyVictory:
                         Debug.Log("TU MEURS!");
