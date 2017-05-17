@@ -52,6 +52,8 @@ public class Player : MonoBehaviour
         LevelManager.Instance.RegisterPlayer(this);
 
         _lastRotation = new Vector3(0, 90, 0);
+
+        ShowCardsInUi();
     }
 
     // Update is called once per frame
@@ -180,5 +182,25 @@ public class Player : MonoBehaviour
     private void RemoveCurrentCard()
     {
         _cards.RemoveAt(0);
+
+        ShowCardsInUi();
+    }
+
+    private void ShowCardsInUi()
+    {
+        Sprite currentCardSprite = null;
+        Sprite nextCardSprite = null;
+
+        if (_cards.Count > 0)
+        {
+            currentCardSprite = _cards[0].Sprite;
+        }
+
+        if (_cards.Count > 1)
+        {
+            nextCardSprite = _cards[1].Sprite;
+        }
+
+        GameUiManager.Instance.IngameUi.SetPlayerCards(_name, currentCardSprite, nextCardSprite);
     }
 }

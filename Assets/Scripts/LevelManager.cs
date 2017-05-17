@@ -51,7 +51,7 @@ public class LevelManager : MonoBehaviour
         //if (kyoiSlider.value != newKyoiValue)
         //{
         _kyoiSliderValue = newKyoiValue;
-        GameUiManager.Instance.SetKyoiSliderValue(_kyoiSliderValue);
+        GameUiManager.Instance.IngameUi.SetKyoiSliderValue(_kyoiSliderValue);
         SplitEnnemies();
         //}
     }

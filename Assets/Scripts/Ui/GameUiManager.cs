@@ -7,10 +7,10 @@ public class GameUiManager : MonoBehaviour
 {
     public static GameUiManager Instance { get; private set; }
 
-    [Header("ingame UI")]
-
     [SerializeField]
-    private Slider _kyoiSlider;
+    private IngameUi _ingameUi;
+
+    public IngameUi IngameUi { get { return _ingameUi; } }
 
     private void Awake()
     {
@@ -22,10 +22,5 @@ public class GameUiManager : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
-    }
-
-    public void SetKyoiSliderValue(float value)
-    {
-        _kyoiSlider.value = value;
     }
 }
