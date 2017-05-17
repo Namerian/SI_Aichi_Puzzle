@@ -23,18 +23,31 @@ public class Card : MonoBehaviour
 
     public CardResult ResolveCard(Player player, Enemy enemy)
     {
-        switch(_type)
+        switch (_type)
         {
-            case CardType.Attack:
+            case CardType.AttackType1:
+                if (enemy.Type == EnemyType.EnemyType1 &&
+                    ((enemy.IsBoss && player.transform.forward == -enemy.transform.forward) || !enemy.IsBoss))
+                {
+                    return CardResult.PlayerVictory;
+                }
                 break;
-            case CardType.AttackBig:
+            case CardType.AttackType2:
+                if (enemy.Type == EnemyType.EnemyType2 &&
+                    ((enemy.IsBoss && player.transform.forward == -enemy.transform.forward) || !enemy.IsBoss))
+                {
+                    return CardResult.PlayerVictory;
+                }
                 break;
-            case CardType.Defense:
-                break;
-            case CardType.DefenseBig:
+            case CardType.AttackType3:
+                if (enemy.Type == EnemyType.EnemyType3 &&
+                    ((enemy.IsBoss && player.transform.forward == -enemy.transform.forward) || !enemy.IsBoss))
+                {
+                    return CardResult.PlayerVictory;
+                }
                 break;
         }
 
-        return CardResult.PlayerVictory;
+        return CardResult.EnemyVictory;
     }
 }
