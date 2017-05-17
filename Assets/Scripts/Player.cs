@@ -18,9 +18,6 @@ public class Player : MonoBehaviour
     private float _stopTime = 0.8f;
 
     [SerializeField]
-	private float _trailMaxLength;
-
-    [SerializeField]						  				
     private Rigidbody _rigidbody;
 
     //[SerializeField]
@@ -50,16 +47,13 @@ public class Player : MonoBehaviour
 
     private bool _stopped = false;
     private Vector3 _lastRotation;
-    private int _numDeaths = 0;
-	private TrailRenderer trailRenderer;								
-	private Vector3 _ennemiesBounds;															   
+    private float _kyoiPoints = 0;
 
     //=================================================================
     // Properties
     //=================================================================
 
     public float KyoiPoints { get { return _kyoiPoints; } }
-    public bool IsDead { get; private set; }
 
     //=================================================================
     // Monobehaviour Methods
@@ -68,12 +62,9 @@ public class Player : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-		_ennemiesBounds = ennemiesFollowingPrefab.GetComponentInChildren<Renderer>().bounds.size;
         LevelManager.Instance.RegisterPlayer(this);
-        trailRenderer = GetComponent<TrailRenderer>();
 
         _lastRotation = new Vector3(0, 90, 0);
-
         ShowCardsInUi();
     }
 
@@ -87,11 +78,6 @@ public class Player : MonoBehaviour
         }
 
         DirectionInputs();
-		SetTrailTime();
-        CreateFollowingEnnemies();
-        trailPositions = new Vector3[trailRenderer.positionCount];
-        trailRenderer.GetPositions(trailPositions);
-        if (ennemiesFollowing.Count > 0) UpdateTrail();
         //ActionInputs();
     }
 
@@ -99,15 +85,12 @@ public class Player : MonoBehaviour
     // Private Methods
     //=================================================================
 
-	 private void SetTrailTime()
-    {
-        if (_name == "PlayerA") trailRenderer.time = _trailMaxLength * ((100 - LevelManager.Instance._kyoiSliderValue * 100) / 100);
-        else trailRenderer.time = _trailMaxLength * LevelManager.Instance._kyoiSliderValue;
-    }
     private void DirectionInputs()
     {
         float axisY = Input.GetAxis(_name + "_AxisY");
         float axisX = Input.GetAxis(_name + "_AxisX");
+
+
         if (_stopped)
         {
             _rigidbody.velocity = this.transform.forward * _speed;
@@ -146,7 +129,7 @@ public class Player : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.collider.CompareTag("Wall") && !IsDead)
+        if (collision.collider.CompareTag("Wall"))
         {
             _stopped = true;
 
@@ -155,7 +138,7 @@ public class Player : MonoBehaviour
 
             Invoke("StartMoving", _stopTime);
         }
-        else if (collision.collider.CompareTag("Enemy") && !IsDead)
+        else if (collision.collider.CompareTag("Enemy"))
         {
             if (_cards.Count == 0)
             {
@@ -179,19 +162,6 @@ public class Player : MonoBehaviour
                 }
 
                 RemoveCurrentCard();
-            }
-        }
-        else if (collision.collider.CompareTag("Player") && IsDead && _numDeaths < _numLives)
-        {
-            Player otherPlayer = collision.collider.GetComponent<Player>();
-
-            if (!otherPlayer.IsDead)
-            {
-                IsDead = false;
-
-                Vector3 rotation = this.transform.localEulerAngles;
-                rotation.z = 0;
-                this.transform.localEulerAngles = rotation;
             }
         }
     }
@@ -240,43 +210,84 @@ public class Player : MonoBehaviour
 
         GameUiManager.Instance.IngameUi.SetPlayerCards(_name, currentCardSprite, nextCardSprite);
     }
-
-    private void PlayerDown()
-    {
-        IsDead = true;
-        _rigidbody.velocity = Vector3.zero;
-
-        Vector3 rotation = this.transform.localEulerAngles;
-        rotation.z = 90;
-        this.transform.localEulerAngles = rotation;												 
-
-        _numDeaths++;
-    }
-	void CreateFollowingEnnemies()
-    {
-        if(trailRenderer.positionCount * trailRenderer.minVertexDistance > ennemiesFollowing.Count * _ennemiesBounds.z)
-        {
-            ennemiesFollowing.Add(Instantiate(ennemiesFollowingPrefab));
-            print("EF" + ennemiesFollowing.Count);
-        }
-        /*
-        if(ennemiesFollowing.Count * _ennemiesBounds.z > trailRenderer.positionCount * trailRenderer.minVertexDistance)
-        {
-            if (ennemiesFollowing[ennemiesFollowing.Count - 1] != null)
-            {
-                ennemiesFollowing.RemoveAt(ennemiesFollowing.Count - 1);
-                Destroy(ennemiesFollowing[ennemiesFollowing.Count - 1]);
-            }
-        }
-        */
-    }
-
-	void UpdateTrail()
-    {
-        for (int i = 0; i < ennemiesFollowing.Count; i++)
-        {
-            //ennemiesFollowing[i].transform.position = trailRenderer.GetPosition(trailRenderer.positionCount - (i + 1 * trailRenderer.positionCount)); //trailRenderer.GetPosition(i); 
-            ennemiesFollowing[i].transform.position = trailPositions[(trailPositions.Length - 1) - (i * (trailPositions.Length / ennemiesFollowing.Count))];
-        }
-    }
 }
+	private float _trailMaxLength;
+
+    [SerializeField]						  				
+    private int _numDeaths = 0;
+	private TrailRenderer trailRenderer;								
+	private Vector3 _ennemiesBounds;															   
+    public bool IsDead { get; private set; }
+
+		_ennemiesBounds = ennemiesFollowingPrefab.GetComponentInChildren<Renderer>().bounds.size;
+        trailRenderer = GetComponent<TrailRenderer>();
+
+		SetTrailTime();
+        CreateFollowingEnnemies();
+        trailPositions = new Vector3[trailRenderer.positionCount];
+        trailRenderer.GetPositions(trailPositions);
+        if (ennemiesFollowing.Count > 0) UpdateTrail();
+	 private void SetTrailTime()
+    {
+        if (_name == "PlayerA") trailRenderer.time = _trailMaxLength * ((100 - LevelManager.Instance._kyoiSliderValue * 100) / 100);
+        else trailRenderer.time = _trailMaxLength * LevelManager.Instance._kyoiSliderValue;
+    }
+        if (collision.collider.CompareTag("Wall") && !IsDead)
+        }
+        else if (collision.collider.CompareTag("Enemy") && !IsDead)
+        }
+        else if (collision.collider.CompareTag("Player") && IsDead && _numDeaths < _numLives)
+        {
+            Player otherPlayer = collision.collider.GetComponent<Player>();
+
+            if (!otherPlayer.IsDead)
+            {
+                IsDead = false;
+
+                Vector3 rotation = this.transform.localEulerAngles;
+                rotation.z = 0;
+                this.transform.localEulerAngles = rotation;
+            }
+        }
+    }
+
+    }
+
+    private void PlayerDown()
+    {
+        IsDead = true;
+        _rigidbody.velocity = Vector3.zero;
+
+        Vector3 rotation = this.transform.localEulerAngles;
+        rotation.z = 90;
+        this.transform.localEulerAngles = rotation;												 
+
+        _numDeaths++;
+    }
+	void CreateFollowingEnnemies()
+    {
+        if(trailRenderer.positionCount * trailRenderer.minVertexDistance > ennemiesFollowing.Count * _ennemiesBounds.z)
+        {
+            ennemiesFollowing.Add(Instantiate(ennemiesFollowingPrefab));
+            print("EF" + ennemiesFollowing.Count);
+        }
+        /*
+        if(ennemiesFollowing.Count * _ennemiesBounds.z > trailRenderer.positionCount * trailRenderer.minVertexDistance)
+        {
+            if (ennemiesFollowing[ennemiesFollowing.Count - 1] != null)
+            {
+                ennemiesFollowing.RemoveAt(ennemiesFollowing.Count - 1);
+                Destroy(ennemiesFollowing[ennemiesFollowing.Count - 1]);
+            }
+        }
+        */
+    }
+
+	void UpdateTrail()
+    {
+        for (int i = 0; i < ennemiesFollowing.Count; i++)
+        {
+            //ennemiesFollowing[i].transform.position = trailRenderer.GetPosition(trailRenderer.positionCount - (i + 1 * trailRenderer.positionCount)); //trailRenderer.GetPosition(i); 
+            ennemiesFollowing[i].transform.position = trailPositions[(trailPositions.Length - 1) - (i * (trailPositions.Length / ennemiesFollowing.Count))];
+        }
+    }
