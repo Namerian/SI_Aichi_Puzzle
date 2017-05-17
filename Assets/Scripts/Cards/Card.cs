@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Card : MonoBehaviour
+public class Card : MonoBehaviour
 {
     [SerializeField]
     private string _name;
@@ -21,5 +21,20 @@ public abstract class Card : MonoBehaviour
     public CardType Type { get { return _type; } }
     public int KyoiPoints { get { return _kyoiPoints; } }
 
-    abstract public CardResult ResolveCard(Player player, Enemy enemy);
+    public CardResult ResolveCard(Player player, Enemy enemy)
+    {
+        switch(_type)
+        {
+            case CardType.Attack:
+                break;
+            case CardType.AttackBig:
+                break;
+            case CardType.Defense:
+                break;
+            case CardType.DefenseBig:
+                break;
+        }
+
+        return CardResult.PlayerVictory;
+    }
 }
