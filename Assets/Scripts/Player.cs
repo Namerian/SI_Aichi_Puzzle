@@ -20,14 +20,11 @@ public class Player : MonoBehaviour
     [SerializeField]
     private Rigidbody _rigidbody;
 
-    [SerializeField]
-    private GameObject _trapPrefab;
+    //[SerializeField]
+    //private GameObject _trapPrefab;
 
     [SerializeField]
     private List<Card> _cards = new List<Card>();
-
-    [SerializeField]
-    private float _kyoiPoints = 0;
 
     //=================================================================
     // Variables - private
@@ -35,6 +32,7 @@ public class Player : MonoBehaviour
 
     private bool _stopped = false;
     private Vector3 _lastRotation;
+    private float _kyoiPoints = 0;
 
     //=================================================================
     // Properties
