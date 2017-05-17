@@ -19,12 +19,6 @@ public class CardManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(this.gameObject);
-
-            if (_cards.Count > 0)
-            {
-                Debug.Log("first card name = " + _cards[0].card.Name);
-                Debug.Log("second card name = " + _cards[1].card.Name);
-            }
         }
         else
         {

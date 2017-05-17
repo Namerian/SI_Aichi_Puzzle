@@ -49,6 +49,8 @@ public class Player : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        LevelManager.Instance.RegisterPlayer(this);
+
         _lastRotation = new Vector3(0, 90, 0);
     }
 

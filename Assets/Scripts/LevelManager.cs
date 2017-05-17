@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class LevelManager : MonoBehaviour
@@ -11,9 +12,14 @@ public class LevelManager : MonoBehaviour
     // Variables - editor
     //=================================================================
 
-    public Player[] players = new Player[2];
     public List<EnemyFollowing> enemiesFollowing = new List<EnemyFollowing>();
-    public Slider kyoiSlider;
+
+    //=================================================================
+    // Variables - private
+    //=================================================================
+
+    private List<Player> _players = new List<Player>();
+    private float _kyoiSliderValue = 0.5f;
 
     //=================================================================
     // Monobehaviour Methods
@@ -24,6 +30,11 @@ public class LevelManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+
+            if (CardManager.Instance == null)
+            {
+                SceneManager.LoadScene("PersistentScene", LoadSceneMode.Additive);
+            }
         }
         else
         {
@@ -35,18 +46,27 @@ public class LevelManager : MonoBehaviour
     void Update()
     {
         //print(((-players[0].KyoiPoints / 2 + players[1].KyoiPoints / 2) / 100));
-        float newKyoiValue = .5f + ((-players[0].KyoiPoints / 2 + players[1].KyoiPoints / 2) / 100);
+        float newKyoiValue = .5f + ((-_players[0].KyoiPoints / 2 + _players[1].KyoiPoints / 2) / 100);
 
         //if (kyoiSlider.value != newKyoiValue)
         //{
-            kyoiSlider.value = newKyoiValue;
-            SplitEnnemies();
+        _kyoiSliderValue = newKyoiValue;
+        GameUiManager.Instance.SetKyoiSliderValue(_kyoiSliderValue);
+        SplitEnnemies();
         //}
     }
 
     //=================================================================
     // Public Methods
     //=================================================================
+
+    public void RegisterPlayer(Player player)
+    {
+        if (!_players.Contains(player))
+        {
+            _players.Add(player);
+        }
+    }
 
     //=================================================================
     // Private Methods
@@ -56,15 +76,15 @@ public class LevelManager : MonoBehaviour
     {
         float num;
 
-        if (kyoiSlider.value >= 0.5f)
+        if (_kyoiSliderValue >= 0.5f)
         {
-            num = kyoiSlider.value * 100;
-            SetEnnemiesTarget(players[0], players[1], num);
+            num = _kyoiSliderValue * 100;
+            SetEnnemiesTarget(_players[0], _players[1], num);
         }
         else
         {
-            num = 100 - kyoiSlider.value * 100;
-            SetEnnemiesTarget(players[1], players[0], num);
+            num = 100 - _kyoiSliderValue * 100;
+            SetEnnemiesTarget(_players[1], _players[0], num);
         }
     }
 
