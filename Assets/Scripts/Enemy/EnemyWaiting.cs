@@ -4,11 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyWaiting : MonoBehaviour {
+public class EnemyWaiting : Enemy {
 
     NavMeshAgent agent;
     public GameObject target;
-    public bool isBoss;
     public GameObject[] players = new GameObject[2];
     public float distTreshold;
 
