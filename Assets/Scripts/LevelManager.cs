@@ -12,7 +12,7 @@ public class LevelManager : MonoBehaviour
     // Variables - editor
     //=================================================================
 
-    public List<EnemyFollowing> enemiesFollowing = new List<EnemyFollowing>();
+    //public List<EnemyFollowing> enemiesFollowing = new List<EnemyFollowing>();
 
     //=================================================================
     // Variables - private
@@ -52,7 +52,7 @@ public class LevelManager : MonoBehaviour
         //{
         _kyoiSliderValue = newKyoiValue;
         GameUiManager.Instance.IngameUi.SetKyoiSliderValue(_kyoiSliderValue);
-        SplitEnnemies();
+        //SplitEnnemies();
         //}
     }
 
@@ -72,32 +72,32 @@ public class LevelManager : MonoBehaviour
     // Private Methods
     //=================================================================
 
-    void SplitEnnemies()
-    {
-        float num;
+    //void SplitEnnemies()
+    //{
+    //    float num;
 
-        if (_kyoiSliderValue >= 0.5f)
-        {
-            num = _kyoiSliderValue * 100;
-            SetEnnemiesTarget(_players[0], _players[1], num);
-        }
-        else
-        {
-            num = 100 - _kyoiSliderValue * 100;
-            SetEnnemiesTarget(_players[1], _players[0], num);
-        }
-    }
+    //    if (_kyoiSliderValue >= 0.5f)
+    //    {
+    //        num = _kyoiSliderValue * 100;
+    //        SetEnnemiesTarget(_players[0], _players[1], num);
+    //    }
+    //    else
+    //    {
+    //        num = 100 - _kyoiSliderValue * 100;
+    //        SetEnnemiesTarget(_players[1], _players[0], num);
+    //    }
+    //}
 
-    void SetEnnemiesTarget(Player mostTartgeted, Player lessTargeted, float percent)
-    {
-        //print((enemiesFollowing.Count / 100f) * percent);
-        for (int i = 0; i < enemiesFollowing.Count; i++)
-        {
-            if (i < (enemiesFollowing.Count / 100f) * percent)
-            {
-                enemiesFollowing[i].target = mostTartgeted.gameObject;
-            }
-            else enemiesFollowing[i].target = lessTargeted.gameObject;
-        }
-    }
+    //void SetEnnemiesTarget(Player mostTartgeted, Player lessTargeted, float percent)
+    //{
+    //    //print((enemiesFollowing.Count / 100f) * percent);
+    //    for (int i = 0; i < enemiesFollowing.Count; i++)
+    //    {
+    //        if (i < (enemiesFollowing.Count / 100f) * percent)
+    //        {
+    //            enemiesFollowing[i].target = mostTartgeted.gameObject;
+    //        }
+    //        else enemiesFollowing[i].target = lessTargeted.gameObject;
+    //    }
+    //}
 }
