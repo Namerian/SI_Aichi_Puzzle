@@ -24,7 +24,6 @@ public class MainMenu : MonoBehaviour
     {
         if(_levelNames.Count >= id)
         {
-            SceneManager.LoadScene("PersistentScene", LoadSceneMode.Additive);
             SceneManager.LoadScene(_levelNames[id]);
         }
     }

@@ -12,7 +12,7 @@ public class Player : MonoBehaviour
     private string _name = "PlayerA";
 
     [SerializeField]
-    private float _speed = 1.5f;
+    private float _speed = 1f;
 
     [SerializeField]
     private float _stopTime = 0.8f;
@@ -32,13 +32,14 @@ public class Player : MonoBehaviour
 
     private bool _stopped = false;
     private Vector3 _lastRotation;
-    private float _kyoiPoints = 0;
+
 
     //=================================================================
     // Properties
     //=================================================================
 
-    public float KyoiPoints { get { return _kyoiPoints; } }
+    public float KyoiPoints { get; private set; }
+    public bool IsDead { get; private set; }
 
     //=================================================================
     // Monobehaviour Methods
@@ -47,7 +48,7 @@ public class Player : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        LevelManager.Instance.RegisterPlayer(this);
+        LevelManager.Instance.RegisterPlayer(_name, this);
 
         _lastRotation = new Vector3(0, 90, 0);
 
@@ -57,6 +58,12 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (IsDead || LevelManager.Instance.IsGamePaused)
+        {
+            _rigidbody.velocity = Vector3.zero;
+            return;
+        }
+
         DirectionInputs();
         //ActionInputs();
     }
@@ -69,7 +76,6 @@ public class Player : MonoBehaviour
     {
         float axisY = Input.GetAxis(_name + "_AxisY");
         float axisX = Input.GetAxis(_name + "_AxisX");
-
 
         if (_stopped)
         {
@@ -109,10 +115,8 @@ public class Player : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.collider.CompareTag("Wall"))
+        if (collision.collider.CompareTag("Wall") && !IsDead)
         {
-            //Debug.Log("ttttttttttttttttttt");
-
             _stopped = true;
 
             this.transform.localEulerAngles = _lastRotation;
@@ -120,31 +124,43 @@ public class Player : MonoBehaviour
 
             Invoke("StartMoving", _stopTime);
         }
-        else if (collision.collider.CompareTag("Enemy"))
+        else if (collision.collider.CompareTag("Enemy") && !IsDead)
         {
-            Enemy e = collision.collider.GetComponent<Enemy>();
-
-            if(_cards.Count == 0)
+            if (_cards.Count == 0)
             {
                 Debug.Log("TU MEURS!");
-                //TODO
+                PlayerDown();
             }
             else
             {
-                CardResult result = _cards[0].ResolveCard(this, e);
+                Enemy enemy = collision.collider.GetComponent<Enemy>();
+                CardResult result = _cards[0].ResolveCard(this, enemy);
 
-                switch(result)
+                switch (result)
                 {
                     case CardResult.PlayerVictory:
-                        Destroy(e.gameObject);
+                        Destroy(enemy.gameObject);
                         break;
                     case CardResult.EnemyVictory:
                         Debug.Log("TU MEURS!");
-                        //TODO
+                        PlayerDown();
                         break;
                 }
 
                 RemoveCurrentCard();
+            }
+        }
+        else if (collision.collider.CompareTag("Player") && IsDead)
+        {
+            Player otherPlayer = collision.collider.GetComponent<Player>();
+
+            if (!otherPlayer.IsDead)
+            {
+                IsDead = false;
+
+                Vector3 rotation = this.transform.localEulerAngles;
+                rotation.z = 0;
+                this.transform.localEulerAngles = rotation;
             }
         }
     }
@@ -192,5 +208,15 @@ public class Player : MonoBehaviour
         }
 
         GameUiManager.Instance.IngameUi.SetPlayerCards(_name, currentCardSprite, nextCardSprite);
+    }
+
+    private void PlayerDown()
+    {
+        IsDead = true;
+        _rigidbody.velocity = Vector3.zero;
+
+        Vector3 rotation = this.transform.localEulerAngles;
+        rotation.z = 90;
+        this.transform.localEulerAngles = rotation;
     }
 }

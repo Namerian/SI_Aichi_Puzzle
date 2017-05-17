@@ -18,8 +18,14 @@ public class LevelManager : MonoBehaviour
     // Variables - private
     //=================================================================
 
-    private List<Player> _players = new List<Player>();
+    private Player[] _players = new Player[2];
     private float _kyoiSliderValue = 0.5f;
+
+    //=================================================================
+    // Properties
+    //=================================================================
+
+    public bool IsGamePaused { get; private set; }
 
     //=================================================================
     // Monobehaviour Methods
@@ -33,7 +39,12 @@ public class LevelManager : MonoBehaviour
 
             if (CardManager.Instance == null)
             {
-                SceneManager.LoadScene("PersistentScene", LoadSceneMode.Additive);
+                Instantiate(Resources.Load("Prefabs/PersistentGameObjects/CardManager"));
+            }
+
+            if (SoundManager.Instance == null)
+            {
+                Instantiate(Resources.Load("Prefabs/PersistentGameObjects/SoundManager"));
             }
         }
         else
@@ -42,9 +53,20 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        IsGamePaused = false;
+    }
+
     // Update is called once per frame
     void Update()
     {
+        if(!IsGamePaused && _players[0].IsDead && _players[1].IsDead)
+        {
+            IsGamePaused = true;
+            GameUiManager.Instance.ActivateGameOverPanel();
+        }
+
         //print(((-players[0].KyoiPoints / 2 + players[1].KyoiPoints / 2) / 100));
         float newKyoiValue = .5f + ((-_players[0].KyoiPoints / 2 + _players[1].KyoiPoints / 2) / 100);
 
@@ -60,11 +82,16 @@ public class LevelManager : MonoBehaviour
     // Public Methods
     //=================================================================
 
-    public void RegisterPlayer(Player player)
+    public void RegisterPlayer(string playerName, Player player)
     {
-        if (!_players.Contains(player))
+        switch (playerName)
         {
-            _players.Add(player);
+            case "PlayerA":
+                _players[0] = player;
+                break;
+            case "PlayerB":
+                _players[1] = player;
+                break;
         }
     }
 
