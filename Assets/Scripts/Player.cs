@@ -26,13 +26,16 @@ public class Player : MonoBehaviour
     [SerializeField]
     private List<Card> _cards = new List<Card>();
 
+    [SerializeField]
+    private int _numLives = 1;
+
     //=================================================================
     // Variables - private
     //=================================================================
 
     private bool _stopped = false;
     private Vector3 _lastRotation;
-
+    private int _numDeaths = 0;
 
     //=================================================================
     // Properties
@@ -150,7 +153,7 @@ public class Player : MonoBehaviour
                 RemoveCurrentCard();
             }
         }
-        else if (collision.collider.CompareTag("Player") && IsDead)
+        else if (collision.collider.CompareTag("Player") && IsDead && _numDeaths < _numLives)
         {
             Player otherPlayer = collision.collider.GetComponent<Player>();
 
@@ -218,5 +221,7 @@ public class Player : MonoBehaviour
         Vector3 rotation = this.transform.localEulerAngles;
         rotation.z = 90;
         this.transform.localEulerAngles = rotation;
+
+        _numDeaths++;
     }
 }
