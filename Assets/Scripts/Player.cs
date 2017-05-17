@@ -43,7 +43,7 @@ public class Player : MonoBehaviour
     public float KyoiPoints { get { return _kyoiPoints; } }
 
     //=================================================================
-    // Monobehaviour
+    // Monobehaviour Methods
     //=================================================================
 
     // Use this for initialization
