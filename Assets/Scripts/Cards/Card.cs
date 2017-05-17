@@ -2,12 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum CardsName { attack, attackBig, defence, trap }
-
-public class Card : MonoBehaviour
+public abstract class Card : MonoBehaviour
 {
-    public CardsName cardName;
-
     [SerializeField]
     private string _name;
 
@@ -15,9 +11,15 @@ public class Card : MonoBehaviour
     private Sprite _sprite;
 
     [SerializeField]
+    private CardType _type;
+
+    [SerializeField]
     private int _kyoiPoints;
 
     public string Name { get { return _name; } }
     public Sprite Sprite { get { return _sprite; } }
+    public CardType Type { get { return _type; } }
     public int KyoiPoints { get { return _kyoiPoints; } }
+
+    abstract public CardResult ResolveCard(Player player, Enemy enemy);
 }

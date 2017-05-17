@@ -60,7 +60,7 @@ public class Player : MonoBehaviour
     void Update()
     {
         DirectionInputs();
-        ActionInputs();
+        //ActionInputs();
     }
 
     //=================================================================
@@ -126,53 +126,45 @@ public class Player : MonoBehaviour
         {
             Enemy e = collision.collider.GetComponent<Enemy>();
 
-            if (e.isBoss) //boss
+            if(_cards.Count == 0)
             {
-                if (_cards[0].cardName == CardsName.attackBig)
-                {
-                    Destroy(e.gameObject);
-                    RemoveCurrentCard();
-                }
-                else
-                {
-                    print("TU MEURS");
-                }
+                Debug.Log("TU MEURS!");
+                //TODO
             }
-            else //non boss
+            else
             {
-                if (_cards[0].cardName == CardsName.attack)
+                CardResult result = _cards[0].ResolveCard(this, e);
+
+                switch(result)
                 {
-                    Destroy(e.gameObject);
-                    RemoveCurrentCard();
+                    case CardResult.PlayerVictory:
+                        Destroy(e.gameObject);
+                        break;
+                    case CardResult.EnemyVictory:
+                        Debug.Log("TU MEURS!");
+                        //TODO
+                        break;
                 }
-                else if (_cards[0].cardName == CardsName.defence)
-                {
-                    RemoveCurrentCard();
-                }
-                else
-                {
-                    print("TU MEURS");
-                    RemoveCurrentCard();
-                }
+
+                RemoveCurrentCard();
             }
         }
     }
 
     private void StartMoving()
     {
-        //Debug.Log("rrrrr");
         _stopped = false;
     }
 
-    private void ActionInputs()
-    {
-        if (Input.GetButton(_name + "_Action") && _cards[0].cardName == CardsName.trap)
-        {
-            GameObject trap = Instantiate(_trapPrefab);
-            trap.transform.position = transform.position;
-            if (_cards[0].cardName == CardsName.trap) RemoveCurrentCard();
-        }
-    }
+    //private void ActionInputs()
+    //{
+    //    if (Input.GetButton(_name + "_Action") && _cards[0].cardName == CardsName.trap)
+    //    {
+    //        GameObject trap = Instantiate(_trapPrefab);
+    //        trap.transform.position = transform.position;
+    //        if (_cards[0].cardName == CardsName.trap) RemoveCurrentCard();
+    //    }
+    //}
 
     private void CheckCard()
     {
