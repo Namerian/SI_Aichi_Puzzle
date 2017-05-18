@@ -1,40 +1,59 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-
+﻿using System.Collections;
+
+using System.Collections.Generic;
+
+using UnityEngine;
+
+using UnityEngine.SceneManagement;
+
+using UnityEngine.UI;
+
+
+
 public class LevelManager : MonoBehaviour
 {
-    public static LevelManager Instance { get; private set; }
+    public static LevelManager Instance { get; private set; }
+
     //=================================================================
     // Variables - editor
-    //=================================================================
-    //public List<EnemyFollowing> enemiesFollowing = new List<EnemyFollowing>();
+    //=================================================================
+
+    //public List<EnemyFollowing> enemiesFollowing = new List<EnemyFollowing>();
+
     [SerializeField]
-    private float _kyoiSliderValue = 0.5f;
+    private float _kyoiSliderValue = 0.5f;
+
     //=================================================================
     // Variables - private
-    //=================================================================
+    //=================================================================
+
     private Player[] _players = new Player[2];
     private List<Enemy> _enemies = new List<Enemy>();
-    private List<Teleporter> _teleporters = new List<Teleporter>();
+    private List<Teleporter> _teleporters = new List<Teleporter>();
+
     //=================================================================
     // Properties
-    //=================================================================
-    public bool IsGamePaused { get; private set; }    public float KyoiSliderValue { get { return _kyoiSliderValue; } }
+    //=================================================================
+
+    public bool IsGamePaused { get; private set; }
+    public float KyoiSliderValue { get { return _kyoiSliderValue; } }
+    public Player[] Players { get { return _players; } }
+
     //=================================================================
     // Monobehaviour Methods
-    //=================================================================
+    //=================================================================
+
     private void Awake()
     {
         if (Instance == null)
         {
-            Instance = this;
+            Instance = this;
+
             if (CardManager.Instance == null)
             {
                 Instantiate(Resources.Load("Prefabs/PersistentGameObjects/CardManager"));
-            }
+            }
+
             if (SoundManager.Instance == null)
             {
                 Instantiate(Resources.Load("Prefabs/PersistentGameObjects/SoundManager"));
@@ -44,11 +63,13 @@ public class LevelManager : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
-    }
+    }
+
     private void Start()
     {
         IsGamePaused = false;
-    }
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -57,11 +78,13 @@ public class LevelManager : MonoBehaviour
         {
             IsGamePaused = true;
             GameUiManager.Instance.ActivateGameOverPanel();
-        }
+        }
+
         //check for victory
         if (!IsGamePaused)
         {
-            bool allEnemiesDead = true;
+            bool allEnemiesDead = true;
+
             foreach (Enemy enemy in _enemies)
             {
                 if (enemy.gameObject.activeSelf)
@@ -69,7 +92,8 @@ public class LevelManager : MonoBehaviour
                     allEnemiesDead = false;
                     break;
                 }
-            }
+            }
+
             if (allEnemiesDead)
             {
                foreach (Teleporter teleporter in _teleporters)
@@ -77,19 +101,23 @@ public class LevelManager : MonoBehaviour
                     teleporter.Activate();
                 }
             }
-        }
+        }
+
         //print(((-players[0].KyoiPoints / 2 + players[1].KyoiPoints / 2) / 100));
-        float newKyoiValue = .5f + ((-_players[0].KyoiPoints / 2 + _players[1].KyoiPoints / 2) / 100);
+        float newKyoiValue = .5f + ((-_players[0].KyoiPoints / 2 + _players[1].KyoiPoints / 2) / 100);
+
         //if (kyoiSlider.value != newKyoiValue)
         //{
         _kyoiSliderValue = newKyoiValue;
         GameUiManager.Instance.IngameUi.SetKyoiSliderValue(_kyoiSliderValue);
         //SplitEnnemies();
         //}
-    }
+    }
+
     //=================================================================
     // Public Methods
-    //=================================================================
+    //=================================================================
+
     public void RegisterPlayer(string playerName, Player player)
     {
         switch (playerName)
@@ -101,24 +129,28 @@ public class LevelManager : MonoBehaviour
                 _players[1] = player;
                 break;
         }
-    }
+    }
+
     public void RegisterEnemy(Enemy enemy)
     {
         if (!_enemies.Contains(enemy))
         {
             _enemies.Add(enemy);
         }
-    }
+    }
+
     public void RegisterTeleporter(Teleporter teleporter)
     {
         if (!_teleporters.Contains(teleporter))
         {
             _teleporters.Add(teleporter);
         }
-    }
+    }
+
     //=================================================================
     // Private Methods
-    //=================================================================
+    //=================================================================
+
     //void SplitEnnemies()
     //{
     //    float num;
@@ -132,7 +164,8 @@ public class LevelManager : MonoBehaviour
     //        num = 100 - _kyoiSliderValue * 100;
     //        SetEnnemiesTarget(_players[1], _players[0], num);
     //    }
-    //}
+    //}
+
     //void SetEnnemiesTarget(Player mostTartgeted, Player lessTargeted, float percent)
     //{
     //    //print((enemiesFollowing.Count / 100f) * percent);
@@ -145,4 +178,5 @@ public class LevelManager : MonoBehaviour
     //        else enemiesFollowing[i].target = lessTargeted.gameObject;
     //    }
     //}
-}
+}
+
