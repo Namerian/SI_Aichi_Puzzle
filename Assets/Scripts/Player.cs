@@ -5,7 +5,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     //=================================================================
-    // Variables - editor
+    // Variables
     //=================================================================
 
     [SerializeField]
@@ -23,9 +23,6 @@ public class Player : MonoBehaviour
     [SerializeField]
     private Rigidbody _rigidbody;
 
-    //[SerializeField]
-    //private GameObject _trapPrefab;
-
     [SerializeField]
     private List<Card> _cards = new List<Card>();
 
@@ -36,19 +33,19 @@ public class Player : MonoBehaviour
     private float _kyoiPoints = 0;
 
     [SerializeField]
-    private GameObject ennemiesFollowingPrefab;
+    private GameObject _ennemiesFollowingPrefab;
 
     [SerializeField]
-    public List<GameObject> enemiesFollowing = new List<GameObject>();
+    private List<GameObject> _enemiesFollowing = new List<GameObject>();
 
     [SerializeField]
-    public List<int> enemiesFollowingPosition = new List<int>();
+    private List<int> _enemiesFollowingPosition = new List<int>();
 
     //[SerializeField]
     //public List<Vector3> enemiesLastTurnPosition = new List<Vector3>();
 
     [SerializeField]
-    private Vector3[] trailPositions;
+    private Vector3[] _trailPositions;
 
     [SerializeField]
     private float _trailMaxLength;
@@ -56,18 +53,20 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int _maxBikeNumber;
 
-    //=================================================================
-    // Variables - private
-    //=================================================================
-
     private bool _stopped = false;
+
     private Vector3 _lastRotation;
+
     private int _numDeaths = 0;
-    private TrailRenderer trailRenderer;
+
+    private TrailRenderer _trailRenderer;
+
     [SerializeField]
     private Vector3 _ennemiesBounds;
+
     [SerializeField]
     private int _bikeNumber;
+
     private float _speed = 1f;
 
     //=================================================================
@@ -92,7 +91,7 @@ public class Player : MonoBehaviour
         print("_________" + ennemiesFollowingPrefab.GetComponent<BoxCollider>().bounds.size);
         */
         LevelManager.Instance.RegisterPlayer(_name, this);
-        trailRenderer = GetComponentInChildren<TrailRenderer>();
+        _trailRenderer = GetComponentInChildren<TrailRenderer>();
 
         _lastRotation = new Vector3(0, 90, 0);
         ShowCardsInUi();
@@ -111,11 +110,11 @@ public class Player : MonoBehaviour
         DirectionInputs();
 
         //SetTrailTime();
-        trailPositions = new Vector3[trailRenderer.positionCount];
-        trailRenderer.GetPositions(trailPositions);
-        System.Array.Reverse(trailPositions);
+        _trailPositions = new Vector3[_trailRenderer.positionCount];
+        _trailRenderer.GetPositions(_trailPositions);
+        System.Array.Reverse(_trailPositions);
 
-        if (enemiesFollowing.Count > 0)
+        if (_enemiesFollowing.Count > 0)
         {
             UpdateTrail();
         }
@@ -135,8 +134,8 @@ public class Player : MonoBehaviour
 
     private void SetTrailTime()
     {
-        if (_name == "PlayerA") trailRenderer.time = _trailMaxLength * ((100 - LevelManager.Instance.KyoiSliderValue * 100) / 100);
-        else trailRenderer.time = _trailMaxLength * LevelManager.Instance.KyoiSliderValue;
+        if (_name == "PlayerA") _trailRenderer.time = _trailMaxLength * ((100 - LevelManager.Instance.KyoiSliderValue * 100) / 100);
+        else _trailRenderer.time = _trailMaxLength * LevelManager.Instance.KyoiSliderValue;
     }
 
     private void DirectionInputs()
@@ -156,19 +155,19 @@ public class Player : MonoBehaviour
 
             Vector3 rot = Vector3.down;
 
-            if (axisY > 0)
+            if (axisY > 0 && this.transform.localEulerAngles != new Vector3(0, 180, 0))
             {
                 rot = new Vector3(0, 0, 0);
             }
-            else if (axisX > 0)
+            else if (axisX > 0 && this.transform.localEulerAngles != new Vector3(0, 270, 0))
             {
                 rot = new Vector3(0, 90, 0);
             }
-            else if (axisY < 0)
+            else if (axisY < 0 && this.transform.localEulerAngles != new Vector3(0, 0, 0))
             {
                 rot = new Vector3(0, 180, 0);
             }
-            else if (axisX < 0)
+            else if (axisX < 0 && this.transform.localEulerAngles != new Vector3(0, 90, 0))
             {
                 rot = new Vector3(0, 270, 0);
             }
@@ -246,16 +245,16 @@ public class Player : MonoBehaviour
             if (e.parentName != _name)
             {
                 Player p = LevelManager.Instance.Players[e.parentName == "PlayerA" ? 0 : 1];
-                int nbBikeFollowing = p.enemiesFollowing.Count;
-                int bikeTouched = p.enemiesFollowing.IndexOf(e.gameObject);
+                int nbBikeFollowing = p._enemiesFollowing.Count;
+                int bikeTouched = p._enemiesFollowing.IndexOf(e.gameObject);
                 float points = (100 / _maxBikeNumber);
                 for (int i = bikeTouched; i < nbBikeFollowing; i++)
                 {
-                    if (p.enemiesFollowing[i] != null)
+                    if (p._enemiesFollowing[i] != null)
                     {
                         print("JE TOUCHE : " + i);
                         //p.enemiesFollowing[i].GetComponent<Collider>().enabled = false;
-                        p.enemiesFollowing[i].GetComponentInChildren<Renderer>().material.color = Color.red;
+                        p._enemiesFollowing[i].GetComponentInChildren<Renderer>().material.color = Color.red;
                         //UnityEditor.EditorApplication.isPaused = true;
 
                         p.KyoiPoints -= points;
@@ -328,64 +327,64 @@ public class Player : MonoBehaviour
         {
             //print("f" + wantedAmountBikes);
             float dist = .05f; //Vector3.Distance(trailPositions[4], trailPositions[5]);
-            if (((trailPositions.Length - 4) * dist > enemiesFollowingPosition.Count * _ennemiesBounds.z))
+            if (((_trailPositions.Length - 4) * dist > _enemiesFollowingPosition.Count * _ennemiesBounds.z))
             {
                 //Debug.Log("ffffffffffffffffffffff");
 
-                if (enemiesFollowing.Count == 0)
+                if (_enemiesFollowing.Count == 0)
                 {
                     //Debug.Log("eeeeeeeeeeeeeeeeeeeeee");
                     Vector3 playerPos = this.transform.position;
-                    for (int i = 0; i < trailPositions.Length; i++)
+                    for (int i = 0; i < _trailPositions.Length; i++)
                     {
                         //Debug.Log(Vector3.Distance(playerPos, trailPositions[i]));
-                        if (Vector3.Distance(playerPos, trailPositions[i]) > 1)
+                        if (Vector3.Distance(playerPos, _trailPositions[i]) > 1)
                         {
                             //Debug.Log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjj");
 
-                            GameObject newBike = Instantiate(ennemiesFollowingPrefab);
-                            enemiesFollowing.Add(newBike);
-                            newBike.name = newBike.name + _name + "_" + (enemiesFollowing.Count - 1);
+                            GameObject newBike = Instantiate(_ennemiesFollowingPrefab);
+                            _enemiesFollowing.Add(newBike);
+                            newBike.name = newBike.name + _name + "_" + (_enemiesFollowing.Count - 1);
                             newBike.GetComponent<EnemyBehindPlayers>().parentName = _name;
                             _bikeNumber++;
 
-                            enemiesFollowingPosition.Add(i);
+                            _enemiesFollowingPosition.Add(i);
 
-                            newBike.transform.position = trailPositions[i];
+                            newBike.transform.position = _trailPositions[i];
                             break;
                         }
                     }
                 }
-                else if (enemiesFollowing.Count > 0)
+                else if (_enemiesFollowing.Count > 0)
                 {
-                    Vector3 lastBikePos = enemiesFollowing[enemiesFollowing.Count - 1].transform.position;
-                    for (int i = enemiesFollowingPosition[enemiesFollowing.Count - 1]; i < trailPositions.Length; i++)
+                    Vector3 lastBikePos = _enemiesFollowing[_enemiesFollowing.Count - 1].transform.position;
+                    for (int i = _enemiesFollowingPosition[_enemiesFollowing.Count - 1]; i < _trailPositions.Length; i++)
                     {
-                        if (Vector3.Distance(lastBikePos, trailPositions[i]) > 1)
+                        if (Vector3.Distance(lastBikePos, _trailPositions[i]) > 1)
                         {
 
-                            GameObject newBike = Instantiate(ennemiesFollowingPrefab);
-                            enemiesFollowing.Add(newBike);
-                            newBike.name = newBike.name + _name + "_" + (enemiesFollowing.Count - 1);
+                            GameObject newBike = Instantiate(_ennemiesFollowingPrefab);
+                            _enemiesFollowing.Add(newBike);
+                            newBike.name = newBike.name + _name + "_" + (_enemiesFollowing.Count - 1);
                             newBike.GetComponent<EnemyBehindPlayers>().parentName = _name;
                             _bikeNumber++;
 
-                            enemiesFollowingPosition.Add(i);
+                            _enemiesFollowingPosition.Add(i);
 
-                            newBike.transform.position = trailPositions[i];
+                            newBike.transform.position = _trailPositions[i];
                             break;
                         }
                     }
                 }
             }
         }
-        else if (_bikeNumber > wantedAmountBikes && enemiesFollowing.Count > wantedAmountBikes && enemiesFollowing.Count > 0)
+        else if (_bikeNumber > wantedAmountBikes && _enemiesFollowing.Count > wantedAmountBikes && _enemiesFollowing.Count > 0)
         {
-            GameObject g = enemiesFollowing[enemiesFollowing.Count - 1];
+            GameObject g = _enemiesFollowing[_enemiesFollowing.Count - 1];
             if (g != null) Destroy(g);
-            enemiesFollowing.RemoveAt(enemiesFollowing.Count - 1);
+            _enemiesFollowing.RemoveAt(_enemiesFollowing.Count - 1);
             //enemiesLastTurnPosition.RemoveAt(enemiesLastTurnPosition.Count - 1);
-            enemiesFollowingPosition.RemoveAt(enemiesFollowingPosition.Count - 1);
+            _enemiesFollowingPosition.RemoveAt(_enemiesFollowingPosition.Count - 1);
             _bikeNumber--;
         }
     }
@@ -395,9 +394,9 @@ public class Player : MonoBehaviour
     /// </summary>
     void UpdateTrail()
     {
-        for (int i = 0; i < enemiesFollowing.Count; i++)
+        for (int i = 0; i < _enemiesFollowing.Count; i++)
         {
-            if (enemiesFollowing[i] != null)
+            if (_enemiesFollowing[i] != null)
             {
                 //ennemiesFollowing[i].transform.position = trailRenderer.GetPosition(trailRenderer.positionCount - (i + 1 * trailRenderer.positionCount)); //trailRenderer.GetPosition(i); 
 
@@ -405,14 +404,14 @@ public class Player : MonoBehaviour
                 //Debug.Log("i=" + i);
                 //Debug.Log("enemy pos=" + enemiesFollowing[i].transform.position);
                 //Debug.Log("trail pos=" + trailPositions[enemiesFollowingPosition[i]]);
-                enemiesFollowing[i].transform.position = trailPositions[enemiesFollowingPosition[i]];
+                _enemiesFollowing[i].transform.position = _trailPositions[_enemiesFollowingPosition[i]];
 
                 //
                 //Debug.Log("enemyFollowingPosition:" + enemiesFollowingPosition[i]);
-                Vector3 previousTrailPos = trailPositions[enemiesFollowingPosition[i] - 1];
-                Vector3 currentTrailPos = trailPositions[enemiesFollowingPosition[i]];
+                Vector3 previousTrailPos = _trailPositions[_enemiesFollowingPosition[i] - 1];
+                Vector3 currentTrailPos = _trailPositions[_enemiesFollowingPosition[i]];
                 Vector3 forward = previousTrailPos - currentTrailPos;
-                enemiesFollowing[i].transform.forward = forward.normalized;
+                _enemiesFollowing[i].transform.forward = forward.normalized;
 
                 //if (enemiesFollowing[i].transform.rotation.eulerAngles.y == 90 || enemiesFollowing[i].transform.rotation.eulerAngles.y == 270)
                 //{

@@ -12,7 +12,8 @@ public class Spectre : MonoBehaviour {
         {
             foreach (GameObject g in ldToDestroy)
             {
-                Destroy(g);
+                g.SetActive(false);
+                //Destroy(g);
                 //FX ?
             }
         }
