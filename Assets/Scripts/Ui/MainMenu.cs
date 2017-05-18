@@ -32,7 +32,8 @@ public class MainMenu : MonoBehaviour
         _mainMenuCanvasGroup.alpha = 1;
         _levelSelectionCanvasGroup.alpha = 0;
 
-        _eventSystem.firstSelectedGameObject = _mainMenuFirstSelected;
+        //_eventSystem.firstSelectedGameObject = _mainMenuFirstSelected;
+        _eventSystem.SetSelectedGameObject(_mainMenuFirstSelected);
     }
 
     public void OnLevelButtonPressed(int id)
@@ -57,7 +58,8 @@ public class MainMenu : MonoBehaviour
         _mainMenuCanvasGroup.alpha = 0;
         _levelSelectionCanvasGroup.alpha = 1;
 
-        _eventSystem.firstSelectedGameObject = _levelSelectionFirstSelected;
+        //_eventSystem.firstSelectedGameObject = _levelSelectionFirstSelected;
+        _eventSystem.SetSelectedGameObject(_levelSelectionFirstSelected);
     }
 
     public void OnBackToMainMenuButtonPressed()
@@ -65,6 +67,7 @@ public class MainMenu : MonoBehaviour
         _mainMenuCanvasGroup.alpha = 1;
         _levelSelectionCanvasGroup.alpha = 0;
 
-        _eventSystem.firstSelectedGameObject = _mainMenuFirstSelected;
+        //_eventSystem.firstSelectedGameObject = _mainMenuFirstSelected;
+        _eventSystem.SetSelectedGameObject(_mainMenuFirstSelected);
     }
 }

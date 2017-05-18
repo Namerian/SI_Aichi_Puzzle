@@ -152,6 +152,16 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    public Player GetOtherPlayer(Player player)
+    {
+        if(player == _players[0])
+        {
+            return _players[1];
+        }
+
+        return _players[0];
+    }
+
     //=================================================================
     // Private Methods
     //=================================================================
