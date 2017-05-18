@@ -23,27 +23,52 @@ public class Card : MonoBehaviour
 
     public CardResult ResolveCard(Player player, Enemy enemy)
     {
+        Vector3 invertedPlayerRot = player.transform.localEulerAngles;
+        invertedPlayerRot.y += 180;
+        if(invertedPlayerRot.y >= 360)
+        {
+            invertedPlayerRot.y -= 360;
+        }
+
         switch (_type)
         {
             case CardType.AttackType1:
-                if (enemy.Type == EnemyType.EnemyType1 &&
-                    ((enemy.IsBoss && player.transform.forward == -enemy.transform.forward) || !enemy.IsBoss))
+                if(enemy.Type == EnemyType.EnemyType1)
                 {
-                    return CardResult.PlayerVictory;
+                    if(enemy.IsBoss && invertedPlayerRot != enemy.transform.localEulerAngles)
+                    {
+                        return CardResult.PlayerVictory;
+                    }
+                    else if(!enemy.IsBoss)
+                    {
+                        return CardResult.PlayerVictory;
+                    }
                 }
                 break;
             case CardType.AttackType2:
-                if (enemy.Type == EnemyType.EnemyType2 &&
-                    ((enemy.IsBoss && player.transform.forward == -enemy.transform.forward) || !enemy.IsBoss))
+                if (enemy.Type == EnemyType.EnemyType2)
                 {
-                    return CardResult.PlayerVictory;
+                    if (enemy.IsBoss && invertedPlayerRot != enemy.transform.localEulerAngles)
+                    {
+                        return CardResult.PlayerVictory;
+                    }
+                    else if (!enemy.IsBoss)
+                    {
+                        return CardResult.PlayerVictory;
+                    }
                 }
                 break;
             case CardType.AttackType3:
-                if (enemy.Type == EnemyType.EnemyType3 &&
-                    ((enemy.IsBoss && player.transform.forward == -enemy.transform.forward) || !enemy.IsBoss))
+                if (enemy.Type == EnemyType.EnemyType3)
                 {
-                    return CardResult.PlayerVictory;
+                    if (enemy.IsBoss && invertedPlayerRot != enemy.transform.localEulerAngles)
+                    {
+                        return CardResult.PlayerVictory;
+                    }
+                    else if (!enemy.IsBoss)
+                    {
+                        return CardResult.PlayerVictory;
+                    }
                 }
                 break;
         }
