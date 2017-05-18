@@ -75,6 +75,7 @@ public class Player : MonoBehaviour
     public float KyoiPoints { get { return _kyoiPoints; } set { _kyoiPoints = value; } }
     public bool IsDead { get; private set; }
     public int BikeNumber { get; set; }
+    public List<Card> Cards { get { return _cards; } }
 
     //=================================================================
     // Monobehaviour Methods

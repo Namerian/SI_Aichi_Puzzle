@@ -12,6 +12,9 @@ public class GameUiManager : MonoBehaviour
     private EventSystem _eventSystem;
 
     [SerializeField]
+    private PlanningPanel _planningPanel;
+
+    [SerializeField]
     private IngameUi _ingameUi;
 
     [SerializeField]
