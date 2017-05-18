@@ -97,7 +97,7 @@ public class Player : MonoBehaviour
     {
         if (IsDead || LevelManager.Instance.IsGamePaused)
         {
-            Debug.Log("player dead or game paused");
+            //Debug.Log("player dead or game paused");
             _rigidbody.velocity = Vector3.zero;
             return;
         }
@@ -135,7 +135,7 @@ public class Player : MonoBehaviour
 
         if (_stopped)
         {
-            Debug.Log("player stopped");
+            //Debug.Log("player stopped");
             _rigidbody.velocity = Vector3.zero;
         }
         else

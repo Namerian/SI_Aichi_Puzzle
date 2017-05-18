@@ -15,11 +15,23 @@ public class PlanningPanel : MonoBehaviour
     [SerializeField]
     private PlayerSkillPanel _playerBSkillPanel;
 
-    [SerializeField]
-    private Text _playerAReadyText;
+    //[SerializeField]
+    //private Text _playerAReadyText;
+
+    //[SerializeField]
+    //private Text _playerBReadyText;
 
     [SerializeField]
-    private Text _playerBReadyText;
+    private GameObject _playerAPressAObj;
+
+    [SerializeField]
+    private GameObject _playerBPressAObj;
+
+    [SerializeField]
+    private GameObject _playerAReadyObj;
+
+    [SerializeField]
+    private GameObject _playerBReadyObj;
 
     [SerializeField]
     private bool _invertPlayerASkills = false;
@@ -36,6 +48,11 @@ public class PlanningPanel : MonoBehaviour
         _canvasGroup.alpha = 0;
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
+
+        _playerAPressAObj.SetActive(true);
+        _playerAReadyObj.SetActive(false);
+        _playerBPressAObj.SetActive(true);
+        _playerBReadyObj.SetActive(false);
     }
 
     // Update is called once per frame
@@ -44,13 +61,17 @@ public class PlanningPanel : MonoBehaviour
         if (!_playerAReady && Input.GetButtonDown("PlayerA_Action"))
         {
             _playerAReady = true;
-            _playerAReadyText.text = "Player A Ready!";
+            //_playerAReadyText.text = "Player A Ready!";
+            _playerAPressAObj.SetActive(false);
+            _playerAReadyObj.SetActive(true);
         }
 
         if (!_playerBReady && Input.GetButtonDown("PlayerB_Action"))
         {
             _playerBReady = true;
-            _playerBReadyText.text = "Player B Ready!";
+            //_playerBReadyText.text = "Player B Ready!";
+            _playerBPressAObj.SetActive(false);
+            _playerBReadyObj.SetActive(true);
         }
 
         if (_playerAReady && _playerBReady)
