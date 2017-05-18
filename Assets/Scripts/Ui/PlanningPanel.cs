@@ -15,12 +15,6 @@ public class PlanningPanel : MonoBehaviour
     [SerializeField]
     private PlayerSkillPanel _playerBSkillPanel;
 
-    //[SerializeField]
-    //private Text _playerAReadyText;
-
-    //[SerializeField]
-    //private Text _playerBReadyText;
-
     [SerializeField]
     private GameObject _playerAPressAObj;
 
@@ -43,25 +37,12 @@ public class PlanningPanel : MonoBehaviour
     private bool _playerBReady;
     private OnPlayersReadyDelegate _callback;
 
-    private void Awake()
-    {
-        _canvasGroup.alpha = 0;
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
-
-        _playerAPressAObj.SetActive(true);
-        _playerAReadyObj.SetActive(false);
-        _playerBPressAObj.SetActive(true);
-        _playerBReadyObj.SetActive(false);
-    }
-
     // Update is called once per frame
     void Update()
     {
         if (!_playerAReady && Input.GetButtonDown("PlayerA_Action"))
         {
             _playerAReady = true;
-            //_playerAReadyText.text = "Player A Ready!";
             _playerAPressAObj.SetActive(false);
             _playerAReadyObj.SetActive(true);
         }
@@ -69,12 +50,11 @@ public class PlanningPanel : MonoBehaviour
         if (!_playerBReady && Input.GetButtonDown("PlayerB_Action"))
         {
             _playerBReady = true;
-            //_playerBReadyText.text = "Player B Ready!";
             _playerBPressAObj.SetActive(false);
             _playerBReadyObj.SetActive(true);
         }
 
-        if (_playerAReady && _playerBReady)
+        if ((_playerAReady && _playerBReady) || Input.GetKeyDown(KeyCode.G))
         {
             _callback();
         }
@@ -82,6 +62,11 @@ public class PlanningPanel : MonoBehaviour
 
     public void Activate(Player playerA, Player playerB, OnPlayersReadyDelegate callback)
     {
+        _playerAPressAObj.SetActive(true);
+        _playerAReadyObj.SetActive(false);
+        _playerBPressAObj.SetActive(true);
+        _playerBReadyObj.SetActive(false);
+
         _canvasGroup.alpha = 1;
 
         _playerASkillPanel.FillSkills(playerA, _invertPlayerASkills);
@@ -93,5 +78,7 @@ public class PlanningPanel : MonoBehaviour
     public void Hide()
     {
         _canvasGroup.alpha = 0;
+        _canvasGroup.interactable = false;
+        _canvasGroup.blocksRaycasts = false;
     }
 }

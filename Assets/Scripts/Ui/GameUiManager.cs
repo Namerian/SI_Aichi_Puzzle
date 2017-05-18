@@ -29,6 +29,14 @@ public class GameUiManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+
+            _planningPanel.gameObject.SetActive(true);
+            _ingameUi.gameObject.SetActive(true);
+            _gameOverPanel.gameObject.SetActive(true);
+
+            _planningPanel.Hide();
+            _ingameUi.Hide();
+            _gameOverPanel.Hide();
         }
         else
         {
@@ -38,20 +46,7 @@ public class GameUiManager : MonoBehaviour
 
     private void Start()
     {
-        if (!_planningPanel.gameObject.activeSelf)
-        {
-            _planningPanel.gameObject.SetActive(true);
-        }
-
-        if (!_ingameUi.gameObject.activeSelf)
-        {
-            _ingameUi.gameObject.SetActive(true);
-        }
-
-        if (!_gameOverPanel.gameObject.activeSelf)
-        {
-            _gameOverPanel.gameObject.SetActive(true);
-        }
+        
     }
 
     public void ActivatePlanningPanel(Player playerA, Player playerB, OnPlayersReadyDelegate OnPlayersReady)

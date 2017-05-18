@@ -11,13 +11,6 @@ public class GameOverPanel : MonoBehaviour
     [SerializeField]
     private GameObject _selectedButton;
 
-    private void Awake()
-    {
-        _canvasGroup.alpha = 0;
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
-    }
-
     public void Activate()
     {
         _canvasGroup.alpha = 1;

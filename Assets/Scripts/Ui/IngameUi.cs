@@ -23,13 +23,6 @@ public class IngameUi : MonoBehaviour
     [SerializeField]
     private Image _nextCardPlayerB;
 
-    private void Awake()
-    {
-        _canvasGroup.alpha = 0;
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
-    }
-
     public void SetKyoiSliderValue(float value)
     {
         _kyoiSlider.value = value;
@@ -43,6 +36,8 @@ public class IngameUi : MonoBehaviour
     public void Hide()
     {
         _canvasGroup.alpha = 0;
+        _canvasGroup.interactable = false;
+        _canvasGroup.blocksRaycasts = false;
     }
 
     public void SetPlayerCards(string playerName, Sprite currentCardSprite, Sprite nextCardSprite)
