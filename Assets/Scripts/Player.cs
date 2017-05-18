@@ -85,6 +85,7 @@ public class Player : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        Debug.Log("DDDDDDDDDDDDDDDDDDD");
         /*
         _ennemiesBounds = ennemiesFollowingPrefab.GetComponent<BoxCollider>().bounds.size;
         print("_________" + ennemiesFollowingPrefab.GetComponent<BoxCollider>().gameObject.name);
@@ -241,6 +242,8 @@ public class Player : MonoBehaviour
                 Vector3 rotation = this.transform.localEulerAngles;
                 rotation.z = 0;
                 this.transform.localEulerAngles = rotation;
+
+                GameUiManager.Instance.IngameUi.ShowAButton(_name);
             }
         }
         else if (collider.CompareTag("EnemyBehindPlayer"))
@@ -327,7 +330,6 @@ public class Player : MonoBehaviour
         _enemiesFollowing.Clear();
         _enemiesFollowingPosition.Clear();
 
-        GameUiManager.Instance.IngameUi.ShowAButton(_name);
         _numDeaths++;
     }
 

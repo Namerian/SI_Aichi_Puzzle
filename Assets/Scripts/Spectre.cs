@@ -6,14 +6,14 @@ public class Spectre : MonoBehaviour {
 
     public GameObject[] ldToDestroy;
 
-	void OnCollisionEnter(Collision c)
+	void OnTriggerEnter(Collider c)
     {
-        if(c.collider.gameObject == GetComponent<Player>())
+        if(c.gameObject.GetComponent<Player>())
         {
+            Debug.Log("Touchey");
             foreach (GameObject g in ldToDestroy)
             {
-                g.SetActive(false);
-                //Destroy(g);
+                Destroy(g);
                 //FX ?
             }
         }

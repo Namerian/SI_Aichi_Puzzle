@@ -103,15 +103,18 @@ public class LevelManager : MonoBehaviour
             }
         }
 
-        //print(((-players[0].KyoiPoints / 2 + players[1].KyoiPoints / 2) / 100));
-        float newKyoiValue = .5f + ((-_players[0].KyoiPoints / 2 + _players[1].KyoiPoints / 2) / 100);
+        if (!IsGamePaused)
+        {
+            //print(((-players[0].KyoiPoints / 2 + players[1].KyoiPoints / 2) / 100));
+            float newKyoiValue = .5f + ((-_players[0].KyoiPoints / 2 + _players[1].KyoiPoints / 2) / 100);
 
-        //if (kyoiSlider.value != newKyoiValue)
-        //{
-        _kyoiSliderValue = newKyoiValue;
-        GameUiManager.Instance.IngameUi.SetKyoiSliderValue(_kyoiSliderValue);
-        //SplitEnnemies();
-        //}
+            //if (kyoiSlider.value != newKyoiValue)
+            //{
+            _kyoiSliderValue = newKyoiValue;
+            GameUiManager.Instance.IngameUi.SetKyoiSliderValue(_kyoiSliderValue);
+            //SplitEnnemies();
+            //}
+        }
     }
 
     //=================================================================
@@ -132,6 +135,7 @@ public class LevelManager : MonoBehaviour
 
         if(_players[0]!= null && _players[1]!= null)
         {
+            Debug.Log("RRRRRRRRRRRRRRRRRRRRRRR");
             GameUiManager.Instance.ActivatePlanningPanel(_players[0], _players[1], OnPlayersReady);
         }
     }
