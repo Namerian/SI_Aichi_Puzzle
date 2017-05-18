@@ -36,4 +36,11 @@ public class GameOverPanel : MonoBehaviour
     {
         SceneManager.LoadScene("MenuScene");
     }
+
+    public void Hide()
+    {
+        _canvasGroup.alpha = 0;
+        _canvasGroup.interactable = false;
+        _canvasGroup.blocksRaycasts = false;
+    }
 }

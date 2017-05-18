@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -25,7 +26,7 @@ public class GameUiManager : MonoBehaviour
 
     private void Awake()
     {
-        if(Instance == null)
+        if (Instance == null)
         {
             Instance = this;
         }
@@ -37,19 +38,43 @@ public class GameUiManager : MonoBehaviour
 
     private void Start()
     {
-        if(!_ingameUi.gameObject.activeSelf)
+        if (!_planningPanel.gameObject.activeSelf)
+        {
+            _planningPanel.gameObject.SetActive(true);
+        }
+
+        if (!_ingameUi.gameObject.activeSelf)
         {
             _ingameUi.gameObject.SetActive(true);
         }
 
-        if(!_gameOverPanel.gameObject.activeSelf)
+        if (!_gameOverPanel.gameObject.activeSelf)
         {
             _gameOverPanel.gameObject.SetActive(true);
         }
     }
 
+    public void ActivatePlanningPanel(Player playerA, Player playerB, OnPlayersReadyDelegate OnPlayersReady)
+    {
+        _ingameUi.Hide();
+        _gameOverPanel.Hide();
+
+        _planningPanel.Activate(playerA, playerB, OnPlayersReady);
+    }
+
+    public void ActivateIngameUi()
+    {
+        _planningPanel.Hide();
+        _gameOverPanel.Hide();
+
+        _ingameUi.Activate();
+    }
+
     public void ActivateGameOverPanel()
     {
+        _planningPanel.Hide();
+        _ingameUi.Hide();
+
         _gameOverPanel.Activate();
     }
 }

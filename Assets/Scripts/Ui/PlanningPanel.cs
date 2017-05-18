@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,10 +10,10 @@ public class PlanningPanel : MonoBehaviour
     private CanvasGroup _canvasGroup;
 
     [SerializeField]
-    private Transform _playerASkillPanel;
+    private PlayerSkillPanel _playerASkillPanel;
 
     [SerializeField]
-    private Transform _playerBSkillPanel;
+    private PlayerSkillPanel _playerBSkillPanel;
 
     [SerializeField]
     private Text _playerAReadyText;
@@ -20,8 +21,15 @@ public class PlanningPanel : MonoBehaviour
     [SerializeField]
     private Text _playerBReadyText;
 
+    [SerializeField]
+    private bool _invertPlayerASkills = false;
+
+    [SerializeField]
+    private bool _invertPlayerBSkills = false;
+
     private bool _playerAReady;
     private bool _playerBReady;
+    private OnPlayersReadyDelegate _callback;
 
     private void Awake()
     {
@@ -30,20 +38,39 @@ public class PlanningPanel : MonoBehaviour
         _canvasGroup.blocksRaycasts = false;
     }
 
-    // Use this for initialization
-    void Start()
-    {
-
-    }
-
     // Update is called once per frame
     void Update()
     {
+        if (!_playerAReady && Input.GetButtonDown("PlayerA_Action"))
+        {
+            _playerAReady = true;
+            _playerAReadyText.text = "Player A Ready!";
+        }
 
+        if (!_playerBReady && Input.GetButtonDown("PlayerB_Action"))
+        {
+            _playerBReady = true;
+            _playerBReadyText.text = "Player B Ready!";
+        }
+
+        if (_playerAReady && _playerBReady)
+        {
+            _callback();
+        }
     }
 
-    public void Activate(Player playerA, Player playerB)
+    public void Activate(Player playerA, Player playerB, OnPlayersReadyDelegate callback)
     {
+        _canvasGroup.alpha = 1;
 
+        _playerASkillPanel.FillSkills(playerA, _invertPlayerASkills);
+        _playerBSkillPanel.FillSkills(playerB, _invertPlayerBSkills);
+
+        _callback = callback;
+    }
+
+    public void Hide()
+    {
+        _canvasGroup.alpha = 0;
     }
 }

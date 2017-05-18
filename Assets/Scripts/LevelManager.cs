@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 using UnityEngine.UI;
 
-
+public delegate void OnPlayersReadyDelegate();
 
 public class LevelManager : MonoBehaviour
 {
@@ -67,7 +67,7 @@ public class LevelManager : MonoBehaviour
 
     private void Start()
     {
-        IsGamePaused = false;
+        IsGamePaused = true;
     }
 
     // Update is called once per frame
@@ -129,6 +129,11 @@ public class LevelManager : MonoBehaviour
                 _players[1] = player;
                 break;
         }
+
+        if(_players[0]!= null && _players[1]!= null)
+        {
+            GameUiManager.Instance.ActivatePlanningPanel(_players[0], _players[1], OnPlayersReady);
+        }
     }
 
     public void RegisterEnemy(Enemy enemy)
@@ -178,5 +183,11 @@ public class LevelManager : MonoBehaviour
     //        else enemiesFollowing[i].target = lessTargeted.gameObject;
     //    }
     //}
+
+    private void OnPlayersReady()
+    {
+        this.IsGamePaused = false;
+        GameUiManager.Instance.ActivateIngameUi();
+    }
 }
 

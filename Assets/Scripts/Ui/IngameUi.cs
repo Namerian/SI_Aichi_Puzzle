@@ -6,6 +6,9 @@ using UnityEngine.UI;
 public class IngameUi : MonoBehaviour
 {
     [SerializeField]
+    private CanvasGroup _canvasGroup;
+
+    [SerializeField]
     private Slider _kyoiSlider;
 
     [SerializeField]
@@ -20,9 +23,26 @@ public class IngameUi : MonoBehaviour
     [SerializeField]
     private Image _nextCardPlayerB;
 
+    private void Awake()
+    {
+        _canvasGroup.alpha = 0;
+        _canvasGroup.interactable = false;
+        _canvasGroup.blocksRaycasts = false;
+    }
+
     public void SetKyoiSliderValue(float value)
     {
         _kyoiSlider.value = value;
+    }
+
+    public void Activate()
+    {
+        _canvasGroup.alpha = 1;
+    }
+
+    public void Hide()
+    {
+        _canvasGroup.alpha = 0;
     }
 
     public void SetPlayerCards(string playerName, Sprite currentCardSprite, Sprite nextCardSprite)
