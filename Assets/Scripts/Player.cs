@@ -230,7 +230,7 @@ public class Player : MonoBehaviour
                 RemoveCurrentCard();
             }
         }
-        else if (collider.CompareTag("Player") && IsDead && _numDeaths < _numLives)
+        else if (collider.CompareTag("Player") && IsDead && _numDeaths < _numLives && !_revived)
         {
             Player otherPlayer = collider.GetComponent<Player>();
 
@@ -246,7 +246,7 @@ public class Player : MonoBehaviour
                 GameUiManager.Instance.IngameUi.ShowAButton(_name);
             }
         }
-        else if (collider.CompareTag("EnemyBehindPlayer"))
+        else if (collider.CompareTag("EnemyBehindPlayer") && !IsDead)
         {
             //Debug.Log("check");
             EnemyBehindPlayers enemy = collider.GetComponent<EnemyBehindPlayers>();
@@ -331,6 +331,8 @@ public class Player : MonoBehaviour
         _enemiesFollowingPosition.Clear();
 
         _numDeaths++;
+
+        this.transform.Translate(-1 * this.transform.forward * 0.2f);
     }
 
     /// <summary>
