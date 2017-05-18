@@ -44,8 +44,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     public List<int> enemiesFollowingPosition = new List<int>();
 
-    [SerializeField]
-    public List<Vector3> enemiesLastTurnPosition = new List<Vector3>();
+    //[SerializeField]
+    //public List<Vector3> enemiesLastTurnPosition = new List<Vector3>();
 
     [SerializeField]
     private Vector3[] trailPositions;
@@ -114,8 +114,14 @@ public class Player : MonoBehaviour
         trailPositions = new Vector3[trailRenderer.positionCount];
         trailRenderer.GetPositions(trailPositions);
         System.Array.Reverse(trailPositions);
+
+        if (enemiesFollowing.Count > 0)
+        {
+            UpdateTrail();
+        }
+
         CreateFollowingEnnemies();
-        if (enemiesFollowing.Count > 0) UpdateTrail();
+
 
         if (_name == "PlayerA") _speed = Mathf.Lerp(_minSpeed, _maxSpeed, (100 - LevelManager.Instance.KyoiSliderValue * 100) / 100);
         else _speed = Mathf.Lerp(_minSpeed, _maxSpeed, LevelManager.Instance.KyoiSliderValue);
@@ -248,16 +254,19 @@ public class Player : MonoBehaviour
                     if (p.enemiesFollowing[i] != null)
                     {
                         print("JE TOUCHE : " + i);
-                        p.enemiesFollowing[i].GetComponent<Collider>().enabled = false;
+                        //p.enemiesFollowing[i].GetComponent<Collider>().enabled = false;
+                        p.enemiesFollowing[i].GetComponentInChildren<Renderer>().material.color = Color.red;
+                        //UnityEditor.EditorApplication.isPaused = true;
+
                         p.KyoiPoints -= points;
                         _kyoiPoints += points;
-                        Destroy(p.enemiesFollowing[i]);
-                        
-                        enemiesFollowing.RemoveAt(i);
-                        enemiesLastTurnPosition.RemoveAt(i);
-                        enemiesFollowingPosition.RemoveAt(i);
-                        Destroy(p.enemiesFollowing[i]);
-                        _bikeNumber--;
+                        //Destroy(p.enemiesFollowing[i]);
+
+                        //enemiesFollowing.RemoveAt(i);
+                        //enemiesLastTurnPosition.RemoveAt(i);
+                        //enemiesFollowingPosition.RemoveAt(i);
+                        //Destroy(p.enemiesFollowing[i]);
+                        //_bikeNumber--;
                     }
                 }
                 print("YEYE" + points + "P .. " + p.KyoiPoints + "  " + _maxBikeNumber);
@@ -269,21 +278,6 @@ public class Player : MonoBehaviour
     private void StartMoving()
     {
         _stopped = false;
-    }
-
-    //private void ActionInputs()
-    //{
-    //    if (Input.GetButton(_name + "_Action") && _cards[0].cardName == CardsName.trap)
-    //    {
-    //        GameObject trap = Instantiate(_trapPrefab);
-    //        trap.transform.position = transform.position;
-    //        if (_cards[0].cardName == CardsName.trap) RemoveCurrentCard();
-    //    }
-    //}
-
-    private void CheckCard()
-    {
-
     }
 
     private void RemoveCurrentCard()
@@ -321,88 +315,135 @@ public class Player : MonoBehaviour
         this.transform.localEulerAngles = rotation;
 
         _numDeaths++;
-
     }
 
+    /// <summary>
+    /// Creates or destroys one following bike per call
+    /// </summary>
     void CreateFollowingEnnemies()
     {
-        int f = Mathf.RoundToInt(Mathf.Lerp(0, _maxBikeNumber, (_kyoiPoints / 100)));
-        if (trailPositions.Length > 10 && _bikeNumber < f)
+        int wantedAmountBikes = Mathf.RoundToInt(Mathf.Lerp(0, _maxBikeNumber, (_kyoiPoints / 100)));
+        //int wantedAmountBikes = 1;
+        if (/*trailPositions.Length > 10 &&*/ _bikeNumber < wantedAmountBikes)
         {
-            print("f" + f);
+            //print("f" + wantedAmountBikes);
             float dist = .05f; //Vector3.Distance(trailPositions[4], trailPositions[5]);
-            if (((trailPositions.Length - 3) * dist > enemiesFollowingPosition.Count * _ennemiesBounds.z))
+            if (((trailPositions.Length - 4) * dist > enemiesFollowingPosition.Count * _ennemiesBounds.z))
             {
-                GameObject g = Instantiate(ennemiesFollowingPrefab);
-                enemiesFollowing.Add(g);
-                g.name = g.name + _name + "_" + (enemiesFollowing.Count - 1);
-                enemiesFollowingPosition.Add(3 + (int)((_ennemiesBounds.z / dist) * (enemiesFollowing.IndexOf(g))));
-                //print(" _ennemiesBounds " + _ennemiesBounds  + " enemiesFollowing.IndexOf(g) " + enemiesFollowing.IndexOf(g) + "(int)((_ennemiesBounds.z / dist) * enemiesFollowing.IndexOf(g))  " + (int)((_ennemiesBounds.z / dist) * enemiesFollowing.IndexOf(g)) + " dist " + dist);
-                enemiesLastTurnPosition.Add(g.transform.position);
-                g.GetComponent<EnemyBehindPlayers>().parentName = _name;
-                _bikeNumber++;
+                //Debug.Log("ffffffffffffffffffffff");
+
+                if (enemiesFollowing.Count == 0)
+                {
+                    //Debug.Log("eeeeeeeeeeeeeeeeeeeeee");
+                    Vector3 playerPos = this.transform.position;
+                    for (int i = 0; i < trailPositions.Length; i++)
+                    {
+                        //Debug.Log(Vector3.Distance(playerPos, trailPositions[i]));
+                        if (Vector3.Distance(playerPos, trailPositions[i]) > 1)
+                        {
+                            //Debug.Log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjj");
+
+                            GameObject newBike = Instantiate(ennemiesFollowingPrefab);
+                            enemiesFollowing.Add(newBike);
+                            newBike.name = newBike.name + _name + "_" + (enemiesFollowing.Count - 1);
+                            newBike.GetComponent<EnemyBehindPlayers>().parentName = _name;
+                            _bikeNumber++;
+
+                            enemiesFollowingPosition.Add(i);
+
+                            newBike.transform.position = trailPositions[i];
+                            break;
+                        }
+                    }
+                }
+                else if (enemiesFollowing.Count > 0)
+                {
+                    Vector3 lastBikePos = enemiesFollowing[enemiesFollowing.Count - 1].transform.position;
+                    for (int i = enemiesFollowingPosition[enemiesFollowing.Count - 1]; i < trailPositions.Length; i++)
+                    {
+                        if (Vector3.Distance(lastBikePos, trailPositions[i]) > 1)
+                        {
+
+                            GameObject newBike = Instantiate(ennemiesFollowingPrefab);
+                            enemiesFollowing.Add(newBike);
+                            newBike.name = newBike.name + _name + "_" + (enemiesFollowing.Count - 1);
+                            newBike.GetComponent<EnemyBehindPlayers>().parentName = _name;
+                            _bikeNumber++;
+
+                            enemiesFollowingPosition.Add(i);
+
+                            newBike.transform.position = trailPositions[i];
+                            break;
+                        }
+                    }
+                }
             }
         }
-        else if (_bikeNumber >= f && enemiesFollowing.Count - 1 > f && enemiesFollowing.Count > 0)
+        else if (_bikeNumber > wantedAmountBikes && enemiesFollowing.Count > wantedAmountBikes && enemiesFollowing.Count > 0)
         {
-            //DestroyLastBike();
+            GameObject g = enemiesFollowing[enemiesFollowing.Count - 1];
+            if (g != null) Destroy(g);
+            enemiesFollowing.RemoveAt(enemiesFollowing.Count - 1);
+            //enemiesLastTurnPosition.RemoveAt(enemiesLastTurnPosition.Count - 1);
+            enemiesFollowingPosition.RemoveAt(enemiesFollowingPosition.Count - 1);
+            _bikeNumber--;
         }
-
-
     }
 
-    void DestroyLastBike()
-    {
-        GameObject g = enemiesFollowing[enemiesFollowing.Count - 1];
-        if (g != null) Destroy(g);
-        enemiesFollowing.RemoveAt(enemiesFollowing.Count - 1);
-        enemiesLastTurnPosition.RemoveAt(enemiesLastTurnPosition.Count - 1);
-        enemiesFollowingPosition.RemoveAt(enemiesFollowingPosition.Count - 1);
-        _bikeNumber--;
-    }
-
-
+    /// <summary>
+    /// Updates the rotation and position of the folowing bikes
+    /// </summary>
     void UpdateTrail()
     {
         for (int i = 0; i < enemiesFollowing.Count; i++)
         {
             if (enemiesFollowing[i] != null)
             {
-
                 //ennemiesFollowing[i].transform.position = trailRenderer.GetPosition(trailRenderer.positionCount - (i + 1 * trailRenderer.positionCount)); //trailRenderer.GetPosition(i); 
-                if (enemiesFollowing[i]) enemiesFollowing[i].transform.position = trailPositions[enemiesFollowingPosition[i]];
 
-                if (enemiesFollowing[i].transform.rotation.eulerAngles.y == 90 || enemiesFollowing[i].transform.rotation.eulerAngles.y == 270)
-                {
-                    if (enemiesFollowing[i].transform.position.z > enemiesLastTurnPosition[i].z)
-                    {
-                        enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 0, 0);
-                        enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
-                    }
-                    else if (enemiesFollowing[i].transform.position.z < enemiesLastTurnPosition[i].z)
-                    {
-                        enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 180, 0);
-                        enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
-                    }
-                }
+                //moves the following bike
+                //Debug.Log("i=" + i);
+                //Debug.Log("enemy pos=" + enemiesFollowing[i].transform.position);
+                //Debug.Log("trail pos=" + trailPositions[enemiesFollowingPosition[i]]);
+                enemiesFollowing[i].transform.position = trailPositions[enemiesFollowingPosition[i]];
 
-                else if (enemiesFollowing[i].transform.rotation.eulerAngles.y == 0 || enemiesFollowing[i].transform.rotation.eulerAngles.y == 180)
-                {
-                    if (enemiesFollowing[i].transform.position.x > enemiesLastTurnPosition[i].x)
-                    {
-                        enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 90, 0);
-                        enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
-                    }
-                    else if (enemiesFollowing[i].transform.position.x < enemiesLastTurnPosition[i].x)
-                    {
-                        enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 270, 0);
-                        enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
-                    }
+                //
+                //Debug.Log("enemyFollowingPosition:" + enemiesFollowingPosition[i]);
+                Vector3 previousTrailPos = trailPositions[enemiesFollowingPosition[i] - 1];
+                Vector3 currentTrailPos = trailPositions[enemiesFollowingPosition[i]];
+                Vector3 forward = previousTrailPos - currentTrailPos;
+                enemiesFollowing[i].transform.forward = forward.normalized;
 
-                }
+                //if (enemiesFollowing[i].transform.rotation.eulerAngles.y == 90 || enemiesFollowing[i].transform.rotation.eulerAngles.y == 270)
+                //{
+                //    if (enemiesFollowing[i].transform.position.z > enemiesLastTurnPosition[i].z)
+                //    {
+                //        enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 0, 0);
+                //        enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
+                //    }
+                //    else if (enemiesFollowing[i].transform.position.z < enemiesLastTurnPosition[i].z)
+                //    {
+                //        enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 180, 0);
+                //        enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
+                //    }
+                //}
+
+                //else if (enemiesFollowing[i].transform.rotation.eulerAngles.y == 0 || enemiesFollowing[i].transform.rotation.eulerAngles.y == 180)
+                //{
+                //    if (enemiesFollowing[i].transform.position.x > enemiesLastTurnPosition[i].x)
+                //    {
+                //        enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 90, 0);
+                //        enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
+                //    }
+                //    else if (enemiesFollowing[i].transform.position.x < enemiesLastTurnPosition[i].x)
+                //    {
+                //        enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 270, 0);
+                //        enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
+                //    }
+
+                //}
             }
         }
-
     }
 
 }
