@@ -64,7 +64,9 @@ public class Player : MonoBehaviour
     private Vector3 _lastRotation;
     private int _numDeaths = 0;
     private TrailRenderer trailRenderer;
+    [SerializeField]
     private Vector3 _ennemiesBounds;
+    [SerializeField]
     private int _bikeNumber;
     private float _speed = 1f;
 
@@ -84,9 +86,13 @@ public class Player : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        _ennemiesBounds = ennemiesFollowingPrefab.GetComponentInChildren<Renderer>().bounds.size;
+        /*
+        _ennemiesBounds = ennemiesFollowingPrefab.GetComponent<BoxCollider>().bounds.size;
+        print("_________" + ennemiesFollowingPrefab.GetComponent<BoxCollider>().gameObject.name);
+        print("_________" + ennemiesFollowingPrefab.GetComponent<BoxCollider>().bounds.size);
+        */
         LevelManager.Instance.RegisterPlayer(_name, this);
-        trailRenderer = GetComponent<TrailRenderer>();
+        trailRenderer = GetComponentInChildren<TrailRenderer>();
 
         _lastRotation = new Vector3(0, 90, 0);
         ShowCardsInUi();
@@ -103,12 +109,12 @@ public class Player : MonoBehaviour
 
         DirectionInputs();
 
-        SetTrailTime();
-        CreateFollowingEnnemies();
+        //SetTrailTime();
         trailPositions = new Vector3[trailRenderer.positionCount];
         trailRenderer.GetPositions(trailPositions);
-        //if (enemiesFollowing.Count > 0) 
-        UpdateTrail();
+        System.Array.Reverse(trailPositions);
+        CreateFollowingEnnemies();
+        if (enemiesFollowing.Count > 0) UpdateTrail();
 
         if (_name == "PlayerA") _speed = Mathf.Lerp(_minSpeed, _maxSpeed, (100 - LevelManager.Instance.KyoiSliderValue * 100) / 100);
         else _speed = Mathf.Lerp(_minSpeed, _maxSpeed, LevelManager.Instance.KyoiSliderValue);
@@ -222,26 +228,37 @@ public class Player : MonoBehaviour
         }
     }
 
-    void OnTriggerExit(Collider c)
+    void OnTriggerEnter(Collider c)
     {
         ////////////////////////////////////////////// à revoiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiir
         if (c.CompareTag("EnemyBehindPlayer"))
         {
             EnemyBehindPlayers e = c.GetComponent<EnemyBehindPlayers>();
             print("Hello : " + c.gameObject.name + " ? " + e.parentName + "??" + _name);
-            if(e.parentName != _name)
+            if (e.parentName != _name)
             {
                 Player p = LevelManager.Instance.Players[e.parentName == "PlayerA" ? 0 : 1];
                 int nbBikeFollowing = p.enemiesFollowing.Count;
-                float bikeTouched = p.enemiesFollowing.IndexOf(e.gameObject);
-                float points = (100 / _maxBikeNumber) * (bikeTouched + 1);
-                for (int i = (int)bikeTouched; i >= 0; i--)
+                int bikeTouched = p.enemiesFollowing.IndexOf(e.gameObject);
+                float points = (100 / _maxBikeNumber);
+                for (int i = bikeTouched; i < nbBikeFollowing; i++)
                 {
-                    p.enemiesFollowing[i].GetComponent<Collider>().enabled = false;
+                    if (p.enemiesFollowing[i] != null)
+                    {
+                        print("JE TOUCHE : " + i);
+                        p.enemiesFollowing[i].GetComponent<Collider>().enabled = false;
+                        p.KyoiPoints -= points;
+                        _kyoiPoints += points;
+                        Destroy(p.enemiesFollowing[i]);
+                        
+                        enemiesFollowing.RemoveAt(i);
+                        enemiesLastTurnPosition.RemoveAt(i);
+                        enemiesFollowingPosition.RemoveAt(i);
+                        Destroy(p.enemiesFollowing[i]);
+                        _bikeNumber--;
+                    }
                 }
-                print("YEYE" + points + "P .. " + p.KyoiPoints +"  " + _maxBikeNumber);
-                p.KyoiPoints -= points;
-                _kyoiPoints += points;
+                print("YEYE" + points + "P .. " + p.KyoiPoints + "  " + _maxBikeNumber);
             }
         }
     }
@@ -307,67 +324,83 @@ public class Player : MonoBehaviour
 
     void CreateFollowingEnnemies()
     {
-        float f;
-        if (_name == "PlayerA") f = (100 - LevelManager.Instance.KyoiSliderValue * 100) / 100;
-        else f = LevelManager.Instance.KyoiSliderValue;
-
-        if ((trailRenderer.positionCount * trailRenderer.minVertexDistance >
-            enemiesFollowing.Count * _ennemiesBounds.z) && _bikeNumber < _maxBikeNumber * f)
+        int f = Mathf.RoundToInt(Mathf.Lerp(0, _maxBikeNumber, (_kyoiPoints / 100)));
+        if (trailPositions.Length > 10 && _bikeNumber < f)
         {
-            GameObject g = Instantiate(ennemiesFollowingPrefab);
-            enemiesFollowing.Add(g);
-            enemiesFollowingPosition.Add(trailRenderer.positionCount - 1);
-            enemiesLastTurnPosition.Add(g.transform.position);
-            g.GetComponent<EnemyBehindPlayers>().parentName = _name;
-            _bikeNumber++;
+            print("f" + f);
+            float dist = .05f; //Vector3.Distance(trailPositions[4], trailPositions[5]);
+            if (((trailPositions.Length - 3) * dist > enemiesFollowingPosition.Count * _ennemiesBounds.z))
+            {
+                GameObject g = Instantiate(ennemiesFollowingPrefab);
+                enemiesFollowing.Add(g);
+                g.name = g.name + _name + "_" + (enemiesFollowing.Count - 1);
+                enemiesFollowingPosition.Add(3 + (int)((_ennemiesBounds.z / dist) * (enemiesFollowing.IndexOf(g))));
+                //print(" _ennemiesBounds " + _ennemiesBounds  + " enemiesFollowing.IndexOf(g) " + enemiesFollowing.IndexOf(g) + "(int)((_ennemiesBounds.z / dist) * enemiesFollowing.IndexOf(g))  " + (int)((_ennemiesBounds.z / dist) * enemiesFollowing.IndexOf(g)) + " dist " + dist);
+                enemiesLastTurnPosition.Add(g.transform.position);
+                g.GetComponent<EnemyBehindPlayers>().parentName = _name;
+                _bikeNumber++;
+            }
+        }
+        else if (_bikeNumber >= f && enemiesFollowing.Count - 1 > f && enemiesFollowing.Count > 0)
+        {
+            //DestroyLastBike();
         }
 
-        if (_bikeNumber > _maxBikeNumber * f)
-        {
-            Destroy(enemiesFollowing[enemiesFollowing.Count - 1]);
-            enemiesFollowing.RemoveAt(enemiesFollowing.Count - 1);
-            enemiesFollowingPosition.RemoveAt(enemiesFollowingPosition.Count - 1);
-            _bikeNumber--;
-        }
 
     }
+
+    void DestroyLastBike()
+    {
+        GameObject g = enemiesFollowing[enemiesFollowing.Count - 1];
+        if (g != null) Destroy(g);
+        enemiesFollowing.RemoveAt(enemiesFollowing.Count - 1);
+        enemiesLastTurnPosition.RemoveAt(enemiesLastTurnPosition.Count - 1);
+        enemiesFollowingPosition.RemoveAt(enemiesFollowingPosition.Count - 1);
+        _bikeNumber--;
+    }
+
 
     void UpdateTrail()
     {
         for (int i = 0; i < enemiesFollowing.Count; i++)
         {
-            //ennemiesFollowing[i].transform.position = trailRenderer.GetPosition(trailRenderer.positionCount - (i + 1 * trailRenderer.positionCount)); //trailRenderer.GetPosition(i); 
-            enemiesFollowing[i].transform.position = trailPositions[enemiesFollowingPosition[i]];
-
-            if (enemiesFollowing[i].transform.rotation.eulerAngles.y == 90 || enemiesFollowing[i].transform.rotation.eulerAngles.y == 270)
+            if (enemiesFollowing[i] != null)
             {
-                if (enemiesFollowing[i].transform.position.z > enemiesLastTurnPosition[i].z)
-                {
-                    enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 0, 0);
-                    enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
-                }
-                else if (enemiesFollowing[i].transform.position.z < enemiesLastTurnPosition[i].z)
-                {
-                    enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 180, 0);
-                    enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
-                }
-            }
 
-            else if (enemiesFollowing[i].transform.rotation.eulerAngles.y == 0 || enemiesFollowing[i].transform.rotation.eulerAngles.y == 180)
-            {
-                if (enemiesFollowing[i].transform.position.x > enemiesLastTurnPosition[i].x)
+                //ennemiesFollowing[i].transform.position = trailRenderer.GetPosition(trailRenderer.positionCount - (i + 1 * trailRenderer.positionCount)); //trailRenderer.GetPosition(i); 
+                if (enemiesFollowing[i]) enemiesFollowing[i].transform.position = trailPositions[enemiesFollowingPosition[i]];
+
+                if (enemiesFollowing[i].transform.rotation.eulerAngles.y == 90 || enemiesFollowing[i].transform.rotation.eulerAngles.y == 270)
                 {
-                    enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 90, 0);
-                    enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
-                }
-                else if (enemiesFollowing[i].transform.position.x < enemiesLastTurnPosition[i].x)
-                {
-                    enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 270, 0);
-                    enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
+                    if (enemiesFollowing[i].transform.position.z > enemiesLastTurnPosition[i].z)
+                    {
+                        enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 0, 0);
+                        enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
+                    }
+                    else if (enemiesFollowing[i].transform.position.z < enemiesLastTurnPosition[i].z)
+                    {
+                        enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 180, 0);
+                        enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
+                    }
                 }
 
+                else if (enemiesFollowing[i].transform.rotation.eulerAngles.y == 0 || enemiesFollowing[i].transform.rotation.eulerAngles.y == 180)
+                {
+                    if (enemiesFollowing[i].transform.position.x > enemiesLastTurnPosition[i].x)
+                    {
+                        enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 90, 0);
+                        enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
+                    }
+                    else if (enemiesFollowing[i].transform.position.x < enemiesLastTurnPosition[i].x)
+                    {
+                        enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 270, 0);
+                        enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
+                    }
+
+                }
             }
         }
+
     }
 
 }
