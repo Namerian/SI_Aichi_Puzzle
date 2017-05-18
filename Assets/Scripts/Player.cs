@@ -106,7 +106,8 @@ public class Player : MonoBehaviour
         CreateFollowingEnnemies();
         trailPositions = new Vector3[trailRenderer.positionCount];
         trailRenderer.GetPositions(trailPositions);
-        if (enemiesFollowing.Count > 0) UpdateTrail();
+        //if (enemiesFollowing.Count > 0) 
+        UpdateTrail();
 
         if (_name == "PlayerA") _speed = Mathf.Lerp(_minSpeed, _maxSpeed, (100 - LevelManager.Instance.KyoiSliderValue * 100) / 100);
         else _speed = Mathf.Lerp(_minSpeed, _maxSpeed, LevelManager.Instance.KyoiSliderValue);
@@ -220,18 +221,24 @@ public class Player : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter(Collider c)
+    void OnTriggerExit(Collider c)
     {
         ////////////////////////////////////////////// à revoiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiir
         if (c.CompareTag("EnemyBehindPlayer"))
         {
             EnemyBehindPlayers e = c.GetComponent<EnemyBehindPlayers>();
+            print("Hello : " + c.gameObject.name + " ? " + e.parentName + "??" + _name);
             if(e.parentName != _name)
             {
                 Player p = LevelManager.Instance.Players[e.parentName == "PlayerA" ? 0 : 1];
                 int nbBikeFollowing = p.enemiesFollowing.Count;
                 float bikeTouched = p.enemiesFollowing.IndexOf(e.gameObject);
-                float points = -10;//p.KyoiPoints / _bikeNumber;
+                float points = (100 / _maxBikeNumber) * (bikeTouched + 1);
+                for (int i = (int)bikeTouched; i >= 0; i--)
+                {
+                    p.enemiesFollowing[i].GetComponent<Collider>().enabled = false;
+                }
+                print("YEYE" + points + "P .. " + p.KyoiPoints +"  " + _maxBikeNumber);
                 p.KyoiPoints -= points;
                 _kyoiPoints += points;
             }
