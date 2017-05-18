@@ -23,6 +23,12 @@ public class IngameUi : MonoBehaviour
     [SerializeField]
     private Image _nextCardPlayerB;
 
+    [SerializeField]
+    private GameObject _AButtonPlayerA;
+
+    [SerializeField]
+    private GameObject _AButtonPlayerB;
+
     public void SetKyoiSliderValue(float value)
     {
         _kyoiSlider.value = value;
@@ -31,6 +37,9 @@ public class IngameUi : MonoBehaviour
     public void Activate()
     {
         _canvasGroup.alpha = 1;
+
+        _AButtonPlayerA.SetActive(false);
+        _AButtonPlayerB.SetActive(false);
     }
 
     public void Hide()
@@ -83,6 +92,32 @@ public class IngameUi : MonoBehaviour
                     _nextCardPlayerB.color = Color.clear;
                 }
 
+                break;
+        }
+    }
+
+    public void ShowAButton(string playerName)
+    {
+        switch(playerName)
+        {
+            case "PlayerA":
+                _AButtonPlayerA.SetActive(true);
+                break;
+            case "PlayerB":
+                _AButtonPlayerB.SetActive(true);
+                break;
+        }
+    }
+
+    public void HideAButton(string playerName)
+    {
+        switch (playerName)
+        {
+            case "PlayerA":
+                _AButtonPlayerA.SetActive(false);
+                break;
+            case "PlayerB":
+                _AButtonPlayerB.SetActive(false);
                 break;
         }
     }

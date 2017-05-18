@@ -9,8 +9,8 @@ public class CardSelectionMenu : MonoBehaviour
     [SerializeField]
     private GameObject _availableCardsPanel;
 
-    [SerializeField]
-    private int _rowLengthAC = 4;
+    //[SerializeField]
+    //private int _rowLengthAC = 4;
 
     [SerializeField]
     private Color _selectionColorA;
@@ -19,16 +19,16 @@ public class CardSelectionMenu : MonoBehaviour
     private Color _selectionColorB;
 
     private List<UiCardButton> _cardButtonsAC = new List<UiCardButton>();
-    private UiCardButton _currentSelectionA;
-    private UiCardButton _currentSelectionB;
+    //private UiCardButton _currentSelectionA;
+    //private UiCardButton _currentSelectionB;
 
     // Use this for initialization
     void Start()
     {
         LoadAvailableCards();
 
-        _currentSelectionA = _cardButtonsAC[0];
-        _cardButtonsAC[0].SetSelectionColor(_selectionColorA);
+        //_currentSelectionA = _cardButtonsAC[0];
+        //_cardButtonsAC[0].SetSelectionColor(_selectionColorA);
 
         //_currentSelectionB = _cardButtonsAC[_rowLengthAC - 1];
         //_cardButtonsAC[_rowLengthAC - 1].SetSelectionColor(_selectionColorB);

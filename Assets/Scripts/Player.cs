@@ -17,8 +17,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _minSpeed;
 
-    [SerializeField]
-    private float _stopTime = 0.8f;
+    //[SerializeField]
+    //private float _stopTime = 0.8f;
 
     [SerializeField]
     private Rigidbody _rigidbody;
@@ -35,16 +35,16 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _ennemiesFollowingPrefab;
 
-    [SerializeField]
+    //[SerializeField]
     private List<GameObject> _enemiesFollowing = new List<GameObject>();
 
-    [SerializeField]
+    //[SerializeField]
     private List<int> _enemiesFollowingPosition = new List<int>();
 
     //[SerializeField]
     //public List<Vector3> enemiesLastTurnPosition = new List<Vector3>();
 
-    [SerializeField]
+    //[SerializeField]
     private Vector3[] _trailPositions;
 
     [SerializeField]
@@ -53,9 +53,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int _maxBikeNumber;
 
-    private bool _stopped = false;
-
-    private Vector3 _lastRotation;
+    //private Vector3 _lastRotation;
 
     private int _numDeaths = 0;
 
@@ -68,6 +66,8 @@ public class Player : MonoBehaviour
     private int _bikeNumber;
 
     private float _speed = 1f;
+
+    private bool _revived = false;
 
     //=================================================================
     // Properties
@@ -93,70 +93,69 @@ public class Player : MonoBehaviour
         LevelManager.Instance.RegisterPlayer(_name, this);
         _trailRenderer = GetComponentInChildren<TrailRenderer>();
 
-        _lastRotation = new Vector3(0, 90, 0);
+        //_lastRotation = new Vector3(0, 90, 0);
         ShowCardsInUi();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (IsDead || LevelManager.Instance.IsGamePaused)
+        if (LevelManager.Instance.IsGamePaused)
         {
             //Debug.Log("player dead or game paused");
             _rigidbody.velocity = Vector3.zero;
             return;
         }
 
+        if (IsDead && _revived && Input.GetButtonDown(_name + "_Action"))
+        {
+            IsDead = false;
+            _revived = false;
+            GameUiManager.Instance.IngameUi.HideAButton(_name);
+        }
+        else if (IsDead && !_revived)
+        {
+            _rigidbody.velocity = Vector3.zero;
+            return;
+        }
+
         DirectionInputs();
 
-        //SetTrailTime();
-        _trailPositions = new Vector3[_trailRenderer.positionCount];
-        //Vector3[] positions = new Vector3[_trailRenderer.positionCount];
-        int numPositions = _trailRenderer.GetPositions(_trailPositions);
-
-        if (_trailPositions.Length > 1)
+        if (!IsDead)
         {
-            _trailPositions[0] = _trailPositions[1];
+            _trailPositions = new Vector3[_trailRenderer.positionCount];
+            _trailRenderer.GetPositions(_trailPositions);
+
+            if (_trailPositions.Length > 1)
+            {
+                _trailPositions[0] = _trailPositions[1];
+            }
+
+            System.Array.Reverse(_trailPositions);
+
+            if (_enemiesFollowing.Count > 0)
+            {
+                UpdateTrail();
+            }
+
+            CreateFollowingEnnemies();
+
+
+            if (_name == "PlayerA") _speed = Mathf.Lerp(_minSpeed, _maxSpeed, (100 - LevelManager.Instance.KyoiSliderValue * 100) / 100);
+            else _speed = Mathf.Lerp(_minSpeed, _maxSpeed, LevelManager.Instance.KyoiSliderValue);
         }
-
-        if (numPositions != _trailRenderer.positionCount)
-        {
-            Debug.Log("RRRRRRRRRRRRRRRRRRRRRRRR");
-        }
-
-        System.Array.Reverse(_trailPositions);
-
-        if (_enemiesFollowing.Count > 0)
-        {
-            UpdateTrail();
-        }
-
-        CreateFollowingEnnemies();
-
-
-        if (_name == "PlayerA") _speed = Mathf.Lerp(_minSpeed, _maxSpeed, (100 - LevelManager.Instance.KyoiSliderValue * 100) / 100);
-        else _speed = Mathf.Lerp(_minSpeed, _maxSpeed, LevelManager.Instance.KyoiSliderValue);
-
-        //ActionInputs();
     }
 
     //=================================================================
     // Private Methods
     //=================================================================
 
-    //private void SetTrailTime()
-    //{
-    //    if (_name == "PlayerA") _trailRenderer.time = _trailMaxLength * ((100 - LevelManager.Instance.KyoiSliderValue * 100) / 100);
-    //    else _trailRenderer.time = _trailMaxLength * LevelManager.Instance.KyoiSliderValue;
-    //}
-
     private void DirectionInputs()
     {
         float axisY = Input.GetAxis(_name + "_AxisY");
         float axisX = Input.GetAxis(_name + "_AxisX");
 
-
-        if (_stopped)
+        if (IsDead)
         {
             //Debug.Log("player stopped");
             _rigidbody.velocity = Vector3.zero;
@@ -164,7 +163,10 @@ public class Player : MonoBehaviour
         else
         {
             _rigidbody.velocity = this.transform.forward * _speed;
+        }
 
+        if (!IsDead || (IsDead && _revived))
+        {
             Vector3 rot = Vector3.down;
 
             if (axisY > 0 && this.transform.localEulerAngles != new Vector3(0, 180, 0))
@@ -186,38 +188,22 @@ public class Player : MonoBehaviour
 
             if (rot != Vector3.down && this.transform.localEulerAngles != rot)
             {
-                _lastRotation = this.transform.localEulerAngles;
+                //_lastRotation = this.transform.localEulerAngles;
                 //Debug.Log(_lastRotation);
                 this.transform.localEulerAngles = rot;
             }
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    void OnTriggerEnter(Collider collider)
     {
-        if (collision.collider.CompareTag("Wall") && !IsDead)
+        if (collider.CompareTag("Wall") && !IsDead)
         {
-            //_stopped = true;
-
             _rigidbody.velocity = Vector3.zero;
 
             PlayerDown();
-
-            //if(this.transform.localEulerAngles == _lastRotation)
-            //{
-            //    Vector3 rot = this.transform.localEulerAngles;
-            //    rot.y += 90;
-            //    this.transform.localEulerAngles = rot;
-            //}
-            //else
-            //{
-            //    this.transform.localEulerAngles = _lastRotation;
-            //    _lastRotation = new Vector3(0, 90, 0);
-            //}
-
-            //Invoke("StartMoving", _stopTime);
         }
-        else if (collision.collider.CompareTag("Enemy") && !IsDead)
+        else if (collider.CompareTag("Enemy") && !IsDead)
         {
             if (_cards.Count == 0)
             {
@@ -226,7 +212,7 @@ public class Player : MonoBehaviour
             }
             else
             {
-                Enemy enemy = collision.collider.GetComponent<Enemy>();
+                Enemy enemy = collider.GetComponent<Enemy>();
                 CardResult result = _cards[0].ResolveCard(this, enemy);
 
                 switch (result)
@@ -243,27 +229,24 @@ public class Player : MonoBehaviour
                 RemoveCurrentCard();
             }
         }
-        else if (collision.collider.CompareTag("Player") && IsDead && _numDeaths < _numLives)
+        else if (collider.CompareTag("Player") && IsDead && _numDeaths < _numLives)
         {
-            Player otherPlayer = collision.collider.GetComponent<Player>();
+            Player otherPlayer = collider.GetComponent<Player>();
 
             if (!otherPlayer.IsDead)
             {
-                IsDead = false;
+                //IsDead = false;
+                _revived = true;
 
                 Vector3 rotation = this.transform.localEulerAngles;
                 rotation.z = 0;
                 this.transform.localEulerAngles = rotation;
             }
         }
-    }
-
-    void OnTriggerEnter(Collider c)
-    {
-        if (c.CompareTag("EnemyBehindPlayer"))
+        else if (collider.CompareTag("EnemyBehindPlayer"))
         {
             //Debug.Log("check");
-            EnemyBehindPlayers enemy = c.GetComponent<EnemyBehindPlayers>();
+            EnemyBehindPlayers enemy = collider.GetComponent<EnemyBehindPlayers>();
             //print("Hello : " + c.gameObject.name + " ? " + enemy.parentName + "??" + _name);
 
             //Condition 1
@@ -288,6 +271,7 @@ public class Player : MonoBehaviour
             if (angle != 90)
             {
                 Debug.Log("merde3");
+                PlayerDown();
                 return;
             }
 
@@ -298,43 +282,7 @@ public class Player : MonoBehaviour
 
             otherPlayer.KyoiPoints -= bikeScore * numBikesToTransfer;
             _kyoiPoints += bikeScore * numBikesToTransfer;
-
-
-            //if (enemy.parentName != _name)
-            //{
-            //    Player p = LevelManager.Instance.Players[enemy.parentName == "PlayerA" ? 0 : 1];
-            //    int nbBikeFollowing = p._enemiesFollowing.Count;
-            //    int bikeTouched = p._enemiesFollowing.IndexOf(enemy.gameObject);
-            //    float points = (100 / _maxBikeNumber);
-            //    for (int i = bikeTouched; i < nbBikeFollowing; i++)
-            //    {
-            //        if (p._enemiesFollowing[i] != null)
-            //        {
-            //            print("JE TOUCHE : " + i);
-            //            //p.enemiesFollowing[i].GetComponent<Collider>().enabled = false;
-            //            p._enemiesFollowing[i].GetComponentInChildren<Renderer>().material.color = Color.red;
-            //            //UnityEditor.EditorApplication.isPaused = true;
-
-            //            p.KyoiPoints -= points;
-            //            _kyoiPoints += points;
-            //            //Destroy(p.enemiesFollowing[i]);
-
-            //            //enemiesFollowing.RemoveAt(i);
-            //            //enemiesLastTurnPosition.RemoveAt(i);
-            //            //enemiesFollowingPosition.RemoveAt(i);
-            //            //Destroy(p.enemiesFollowing[i]);
-            //            //_bikeNumber--;
-            //        }
-            //    }
-            //    print("YEYE" + points + "P .. " + p.KyoiPoints + "  " + _maxBikeNumber);
-            //}
         }
-    }
-
-
-    private void StartMoving()
-    {
-        _stopped = false;
     }
 
     private void RemoveCurrentCard()
@@ -371,6 +319,15 @@ public class Player : MonoBehaviour
         rotation.z = 90;
         this.transform.localEulerAngles = rotation;
 
+        foreach (GameObject go in _enemiesFollowing)
+        {
+            Destroy(go);
+        }
+        _bikeNumber = 0;
+        _enemiesFollowing.Clear();
+        _enemiesFollowingPosition.Clear();
+
+        GameUiManager.Instance.IngameUi.ShowAButton(_name);
         _numDeaths++;
     }
 
@@ -528,65 +485,5 @@ public class Player : MonoBehaviour
                 }
             }
         }
-
-
-        //for (int i = 0; i < _enemiesFollowing.Count; i++)
-        //{
-        //    if (_enemiesFollowing[i] != null)
-        //    {
-
-
-
-        //ennemiesFollowing[i].transform.position = trailRenderer.GetPosition(trailRenderer.positionCount - (i + 1 * trailRenderer.positionCount)); //trailRenderer.GetPosition(i); 
-
-        //moves the following bike
-        //Debug.Log("i=" + i);
-        //Debug.Log("enemy pos=" + enemiesFollowing[i].transform.position);
-        //Debug.Log("trail pos=" + trailPositions[enemiesFollowingPosition[i]]);
-
-
-        //_enemiesFollowing[i].transform.position = _trailPositions[_enemiesFollowingPosition[i]];
-
-        ////
-        //Debug.Log("enemyFollowingPosition:" + _enemiesFollowingPosition[i]);
-        //Debug.Log("previous trailPosition: " + _trailPositions[_enemiesFollowingPosition[i] - 1]);
-        //Debug.Log("current trailPosition: " + _trailPositions[_enemiesFollowingPosition[i]]);
-
-        //Vector3 previousTrailPos = _trailPositions[_enemiesFollowingPosition[i] - 1];
-        //Vector3 currentTrailPos = _trailPositions[_enemiesFollowingPosition[i]];
-        //Vector3 forward = previousTrailPos - currentTrailPos;
-        //_enemiesFollowing[i].transform.forward = forward.normalized;
-
-        //if (enemiesFollowing[i].transform.rotation.eulerAngles.y == 90 || enemiesFollowing[i].transform.rotation.eulerAngles.y == 270)
-        //{
-        //    if (enemiesFollowing[i].transform.position.z > enemiesLastTurnPosition[i].z)
-        //    {
-        //        enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 0, 0);
-        //        enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
-        //    }
-        //    else if (enemiesFollowing[i].transform.position.z < enemiesLastTurnPosition[i].z)
-        //    {
-        //        enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 180, 0);
-        //        enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
-        //    }
-        //}
-
-        //else if (enemiesFollowing[i].transform.rotation.eulerAngles.y == 0 || enemiesFollowing[i].transform.rotation.eulerAngles.y == 180)
-        //{
-        //    if (enemiesFollowing[i].transform.position.x > enemiesLastTurnPosition[i].x)
-        //    {
-        //        enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 90, 0);
-        //        enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
-        //    }
-        //    else if (enemiesFollowing[i].transform.position.x < enemiesLastTurnPosition[i].x)
-        //    {
-        //        enemiesFollowing[i].transform.localEulerAngles = new Vector3(0, 270, 0);
-        //        enemiesLastTurnPosition[i] = enemiesFollowing[i].transform.position;
-        //    }
-
-        //}
-        //    }
-        //}
     }
-
 }
