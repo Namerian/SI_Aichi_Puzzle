@@ -17,7 +17,7 @@ public class GameOverPanel : MonoBehaviour
         _canvasGroup.interactable = true;
         _canvasGroup.blocksRaycasts = true;
 
-        GameUiManager.Instance.EventSystem.firstSelectedGameObject = _selectedButton;
+        GameUiManager.Instance.EventSystem.SetSelectedGameObject(_selectedButton);
     }
 
     public void OnReloadButtonPressed()

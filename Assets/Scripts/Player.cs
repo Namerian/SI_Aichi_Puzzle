@@ -198,8 +198,14 @@ public class Player : MonoBehaviour
 
     void OnTriggerEnter(Collider collider)
     {
+        if (collider.CompareTag("Wall"))
+        {
+            Debug.Log(_name + "hit a wall but! isDeas=" + IsDead);
+        }
+
         if (collider.CompareTag("Wall") && !IsDead)
         {
+            Debug.Log(_name + "hit a wall!");
             _rigidbody.velocity = Vector3.zero;
 
             PlayerDown();
