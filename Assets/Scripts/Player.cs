@@ -82,6 +82,12 @@ public class Player : MonoBehaviour
 
     private GameObject _currentFxObject;
 
+    [SerializeField]
+    private Collider _normalCollider;
+
+    [SerializeField]
+    private Collider _reviveCollider;
+
     //=================================================================
     // Properties
     //=================================================================
@@ -111,6 +117,9 @@ public class Player : MonoBehaviour
 
         //_lastRotation = new Vector3(0, 90, 0);
         ShowCardsInUi();
+
+        _normalCollider.enabled = true;
+        _reviveCollider.enabled = false;
     }
 
     // Update is called once per frame
@@ -129,6 +138,8 @@ public class Player : MonoBehaviour
             _revived = false;
             GameUiManager.Instance.IngameUi.HideAButton(_name);
             SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._Revive, false);
+
+            _normalCollider.enabled = true;
         }
         else if (IsDead && !_revived)
         {
@@ -281,6 +292,8 @@ public class Player : MonoBehaviour
 
                 GameUiManager.Instance.IngameUi.ShowAButton(_name);
                 SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._PreRevive, false);
+
+                _reviveCollider.enabled = false;
             }
         }
         else if (collider.CompareTag("EnemyBehindPlayer") && !IsDead)
@@ -385,6 +398,9 @@ public class Player : MonoBehaviour
         _numDeaths++;
 
         this.transform.Translate(-1 * this.transform.forward * 0.2f);
+
+        _normalCollider.enabled = false;
+        _reviveCollider.enabled = true;
     }
 
     /// <summary>
