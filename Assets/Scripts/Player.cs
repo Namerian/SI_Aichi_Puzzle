@@ -275,6 +275,10 @@ public class Player : MonoBehaviour
                 rotation.z = 0;
                 this.transform.localEulerAngles = rotation;
 
+                Vector3 position = this.transform.position;
+                position.y -= 0.12f;
+                this.transform.position = position;
+
                 GameUiManager.Instance.IngameUi.ShowAButton(_name);
                 SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._PreRevive, false);
             }
@@ -365,10 +369,15 @@ public class Player : MonoBehaviour
         rotation.z = 90;
         this.transform.localEulerAngles = rotation;
 
+        Vector3 position = this.transform.position;
+        position.y += 0.12f;
+        this.transform.position = position;
+
         foreach (GameObject go in _enemiesFollowing)
         {
             Destroy(go);
         }
+
         _bikeNumber = 0;
         _enemiesFollowing.Clear();
         _enemiesFollowingPosition.Clear();
@@ -442,7 +451,7 @@ public class Player : MonoBehaviour
 
                     if (distance > 1)
                     {
-                        Vector3 previousTrailPos = _trailPositions[i-1];
+                        Vector3 previousTrailPos = _trailPositions[i - 1];
                         Vector3 currentTrailPos = _trailPositions[i];
                         Vector3 forward = previousTrailPos - currentTrailPos;
                         Quaternion rot = Quaternion.LookRotation(forward, Vector3.up);
