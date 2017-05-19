@@ -60,7 +60,7 @@ public class Player : MonoBehaviour
     private TrailRenderer _trailRenderer;
 
     //[SerializeField]
-    private Vector3 _ennemiesBounds;
+    //private Vector3 _ennemiesBounds;
 
     //[SerializeField]
     private int _bikeNumber;
@@ -247,7 +247,7 @@ public class Player : MonoBehaviour
                         enemy.gameObject.SetActive(false);
 
                         Destroy(_currentFxObject);
-                        _currentFxObject = Instantiate(_fxPrefab, enemy.transform.position + 0.5f*Vector3.up, this.transform.localRotation);
+                        _currentFxObject = Instantiate(_fxPrefab, enemy.transform.position + 0.5f * Vector3.up, this.transform.localRotation);
                         Invoke("DestroyFX", 5f);
 
                         SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._HitPlayer, false);
@@ -292,21 +292,26 @@ public class Player : MonoBehaviour
                 return;
             }
 
+            //UnityEditor.EditorApplication.isPaused = true;
+
             //Condition 2
             Player otherPlayer = LevelManager.Instance.GetOtherPlayer(this);
             if (otherPlayer.KyoiPoints < this.KyoiPoints)
             {
-                //Debug.Log("merde2");
+                Debug.Log("merde2");
+                SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._Lose, false);
+                PlayerDown();
+
                 return;
             }
 
             //Condition 3
-            int angle = (int)Vector3.Angle(this.transform.forward, enemy.transform.forward);
+            int angle = Mathf.RoundToInt(Vector3.Angle(this.transform.forward, enemy.transform.forward));
             //Debug.Log("ANGLE: " + angle);
 
             if (angle != 90)
             {
-                Debug.Log("merde3");
+                Debug.Log("merde3; angle=" + angle);
                 PlayerDown();
                 return;
             }
@@ -383,66 +388,82 @@ public class Player : MonoBehaviour
         if (/*trailPositions.Length > 10 &&*/ _bikeNumber < wantedAmountBikes)
         {
             //print("f" + wantedAmountBikes);
-            float dist = .05f; //Vector3.Distance(trailPositions[4], trailPositions[5]);
-            if (((_trailPositions.Length - 4) * dist > _enemiesFollowingPosition.Count * _ennemiesBounds.z))
+            //float dist = .05f;
+            //Vector3.Distance(trailPositions[4], trailPositions[5]);
+            //if (((_trailPositions.Length - 4) * dist > _enemiesFollowingPosition.Count * _ennemiesBounds.z))
+            //{
+            if (_enemiesFollowing.Count == 0)
             {
-                if (_enemiesFollowing.Count == 0)
+                Vector3 playerPos = this.transform.position;
+                float distance = 0;
+
+                for (int i = 1; i < _trailPositions.Length; i++)
                 {
-                    Vector3 playerPos = this.transform.position;
-                    float distance = 0;
-
-                    for (int i = 1; i < _trailPositions.Length; i++)
+                    if (i > 1)
                     {
-                        if (i > 1)
-                        {
-                            distance += Vector3.Distance(_trailPositions[i - 1], _trailPositions[i]);
-                        }
-
-                        if (distance > 1)
-                        {
-                            GameObject newBike = Instantiate(_ennemiesFollowingPrefab);
-                            _enemiesFollowing.Add(newBike);
-                            newBike.name = newBike.name + _name + "_" + (_enemiesFollowing.Count - 1);
-                            newBike.GetComponent<EnemyBehindPlayers>().parentName = _name;
-                            _bikeNumber++;
-
-                            _enemiesFollowingPosition.Add(i);
-                            //Debug.Log("new Enemy Bike: id=" + (_enemiesFollowing.Count - 1) + "; trail position index = " + _enemiesFollowingPosition[_enemiesFollowingPosition.Count - 1]);
-
-                            newBike.transform.position = _trailPositions[i];
-                            break;
-                        }
+                        distance += Vector3.Distance(_trailPositions[i - 1], _trailPositions[i]);
                     }
-                }
-                else if (_enemiesFollowing.Count > 0)
-                {
-                    Vector3 lastBikePos = _enemiesFollowing[_enemiesFollowing.Count - 1].transform.position;
-                    float distance = 0;
 
-                    for (int i = _enemiesFollowingPosition[_enemiesFollowing.Count - 1]; i < _trailPositions.Length; i++)
+                    if (distance > 1)
                     {
-                        if (i > 1)
-                        {
-                            distance += Vector3.Distance(_trailPositions[i - 1], _trailPositions[i]);
-                        }
+                        Vector3 previousTrailPos = _trailPositions[i - 1];
+                        Vector3 currentTrailPos = _trailPositions[i];
+                        Vector3 forward = previousTrailPos - currentTrailPos;
+                        Quaternion rot = Quaternion.LookRotation(forward, Vector3.up);
 
-                        if (distance > 1)
-                        {
-                            GameObject newBike = Instantiate(_ennemiesFollowingPrefab);
-                            _enemiesFollowing.Add(newBike);
-                            newBike.name = newBike.name + _name + "_" + (_enemiesFollowing.Count - 1);
-                            newBike.GetComponent<EnemyBehindPlayers>().parentName = _name;
-                            _bikeNumber++;
+                        Vector3 position = _trailPositions[i];
 
-                            _enemiesFollowingPosition.Add(i);
-                            //Debug.Log("new Enemy Bike: id=" + (_enemiesFollowing.Count - 1) + "; trail position index = " + _enemiesFollowingPosition[_enemiesFollowingPosition.Count - 1]);
+                        GameObject newBike = Instantiate(_ennemiesFollowingPrefab, position, rot);
 
-                            newBike.transform.position = _trailPositions[i];
-                            break;
-                        }
+                        _enemiesFollowing.Add(newBike);
+                        newBike.name = newBike.name + _name + "_" + (_enemiesFollowing.Count - 1);
+                        newBike.GetComponent<EnemyBehindPlayers>().parentName = _name;
+                        _bikeNumber++;
+
+                        _enemiesFollowingPosition.Add(i);
+                        //Debug.Log("new Enemy Bike: id=" + (_enemiesFollowing.Count - 1) + "; trail position index = " + _enemiesFollowingPosition[_enemiesFollowingPosition.Count - 1]);
+
+                        //newBike.transform.position = _trailPositions[i];
+                        break;
                     }
                 }
             }
+            else if (_enemiesFollowing.Count > 0)
+            {
+                Vector3 lastBikePos = _enemiesFollowing[_enemiesFollowing.Count - 1].transform.position;
+                float distance = 0;
+
+                for (int i = _enemiesFollowingPosition[_enemiesFollowing.Count - 1]; i < _trailPositions.Length; i++)
+                {
+                    if (i > 1)
+                    {
+                        distance += Vector3.Distance(_trailPositions[i - 1], _trailPositions[i]);
+                    }
+
+                    if (distance > 1)
+                    {
+                        Vector3 previousTrailPos = _trailPositions[i-1];
+                        Vector3 currentTrailPos = _trailPositions[i];
+                        Vector3 forward = previousTrailPos - currentTrailPos;
+                        Quaternion rot = Quaternion.LookRotation(forward, Vector3.up);
+
+                        Vector3 position = _trailPositions[i];
+
+                        GameObject newBike = Instantiate(_ennemiesFollowingPrefab, position, rot);
+                        _enemiesFollowing.Add(newBike);
+                        newBike.name = newBike.name + _name + "_" + (_enemiesFollowing.Count - 1);
+                        newBike.GetComponent<EnemyBehindPlayers>().parentName = _name;
+                        _bikeNumber++;
+
+                        _enemiesFollowingPosition.Add(i);
+                        //Debug.Log("new Enemy Bike: id=" + (_enemiesFollowing.Count - 1) + "; trail position index = " + _enemiesFollowingPosition[_enemiesFollowingPosition.Count - 1]);
+
+                        //newBike.transform.position = _trailPositions[i];
+                        break;
+                    }
+                }
+            }
+            //}
         }
         else if (_bikeNumber > wantedAmountBikes && _enemiesFollowing.Count > wantedAmountBikes && _enemiesFollowing.Count > 0)
         {

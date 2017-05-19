@@ -57,6 +57,8 @@ public class PlanningPanel : MonoBehaviour
         if ((_playerAReady && _playerBReady) || Input.GetKeyDown(KeyCode.G))
         {
             _callback();
+            _playerAReady = false;
+            _playerBReady = false;
         }
     }
 
