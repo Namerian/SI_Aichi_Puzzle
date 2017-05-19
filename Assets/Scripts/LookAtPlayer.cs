@@ -10,6 +10,12 @@ public class LookAtPlayer : MonoBehaviour
     private Vector3 direction;
     private Vector3 transformPosition;
     private Vector3 camPosition;
+
+    private void OnValidate()
+    {
+        Update();
+    }
+
     // Use this for initialization
     void Start()
     {

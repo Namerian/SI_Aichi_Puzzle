@@ -47,7 +47,7 @@ public class Player : MonoBehaviour
     //[SerializeField]
     private Vector3[] _trailPositions;
 
-    [SerializeField]
+    //[SerializeField]
     private float _trailMaxLength;
 
     [SerializeField]
@@ -59,15 +59,23 @@ public class Player : MonoBehaviour
 
     private TrailRenderer _trailRenderer;
 
-    [SerializeField]
+    //[SerializeField]
     private Vector3 _ennemiesBounds;
 
-    [SerializeField]
+    //[SerializeField]
     private int _bikeNumber;
 
     private float _speed = 1f;
 
     private bool _revived = false;
+
+    [SerializeField]
+    private GameObject _lineRendererPrefab;
+
+    private LineRenderer _lineRenderer;
+
+    [SerializeField]
+    private int _tailLength = 15;
 
     //=================================================================
     // Properties
@@ -93,6 +101,8 @@ public class Player : MonoBehaviour
         */
         LevelManager.Instance.RegisterPlayer(_name, this);
         _trailRenderer = GetComponentInChildren<TrailRenderer>();
+
+        _lineRenderer = Instantiate(_lineRendererPrefab).GetComponent<LineRenderer>();
 
         //_lastRotation = new Vector3(0, 90, 0);
         ShowCardsInUi();
@@ -138,6 +148,7 @@ public class Player : MonoBehaviour
             if (_enemiesFollowing.Count > 0)
             {
                 UpdateTrail();
+                UpdateLineRenderer();
             }
 
             CreateFollowingEnnemies();
@@ -501,5 +512,31 @@ public class Player : MonoBehaviour
                 }
             }
         }
+    }
+
+    //****************************************
+    //update lineRenderer
+    private void UpdateLineRenderer()
+    {
+        //Debug.Log("fffffffffffffffffffff");
+
+        int numPositions = _enemiesFollowingPosition[_enemiesFollowing.Count - 1] + _tailLength;
+
+        if (numPositions >= _trailPositions.Length - 2)
+        {
+            numPositions = _trailPositions.Length - 2;
+        }
+
+        Vector3[] positions = new Vector3[numPositions];
+
+        for (int i = 0; i < numPositions; i++)
+        {
+            //if (i == _trailPositions.Length - 2) Debug.Log("gggggggggg");
+
+            positions[i] = _trailPositions[i + 1];
+        }
+
+        _lineRenderer.positionCount = numPositions;
+        _lineRenderer.SetPositions(positions);
     }
 }
