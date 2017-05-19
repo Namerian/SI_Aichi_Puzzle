@@ -77,6 +77,11 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int _tailLength = 15;
 
+    [SerializeField]
+    private GameObject _fxPrefab;
+
+    private GameObject _currentFxObject;
+
     //=================================================================
     // Properties
     //=================================================================
@@ -240,6 +245,11 @@ public class Player : MonoBehaviour
                 {
                     case CardResult.PlayerVictory:
                         enemy.gameObject.SetActive(false);
+
+                        Destroy(_currentFxObject);
+                        _currentFxObject = Instantiate(_fxPrefab, enemy.transform.position + 0.5f*Vector3.up, this.transform.localRotation);
+                        Invoke("DestroyFX", 5f);
+
                         SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._HitPlayer, false);
                         break;
                     case CardResult.EnemyVictory:
@@ -309,6 +319,11 @@ public class Player : MonoBehaviour
             otherPlayer.KyoiPoints -= bikeScore * numBikesToTransfer;
             _kyoiPoints += bikeScore * numBikesToTransfer;
         }
+    }
+
+    private void DestroyFX()
+    {
+        Destroy(_currentFxObject);
     }
 
     private void RemoveCurrentCard()
