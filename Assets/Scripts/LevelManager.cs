@@ -49,10 +49,10 @@ public class LevelManager : MonoBehaviour
         {
             Instance = this;
 
-            if (CardManager.Instance == null)
-            {
-                Instantiate(Resources.Load("Prefabs/PersistentGameObjects/CardManager"));
-            }
+            //if (CardManager.Instance == null)
+            //{
+            //    Instantiate(Resources.Load("Prefabs/PersistentGameObjects/CardManager"));
+            //}
 
             if (SoundManager.Instance == null)
             {
