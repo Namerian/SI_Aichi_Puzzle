@@ -224,20 +224,42 @@ public class Player : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter(Collider collider)
+    private void OnCollisionEnter(Collision collision)
     {
-        if (collider.CompareTag("Wall"))
-        {
-            Debug.Log(_name + "hit a wall but! isDeas=" + IsDead);
-        }
-
-        if (collider.CompareTag("Wall") && !IsDead)
+        if (collision.collider.CompareTag("Wall") && !IsDead)
         {
             Debug.Log(_name + "hit a wall!");
             _rigidbody.velocity = Vector3.zero;
             SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._Lose, false);
 
             PlayerDown();
+        }       
+    }
+
+    void OnTriggerEnter(Collider collider)
+    {
+        if (collider.CompareTag("Player") && IsDead && _numDeaths < _numLives && !_revived)
+        {
+            Player otherPlayer = collider.GetComponent<Player>();
+
+            if (!otherPlayer.IsDead)
+            {
+                //IsDead = false;
+                _revived = true;
+
+                Vector3 rotation = this.transform.localEulerAngles;
+                rotation.z = 0;
+                this.transform.localEulerAngles = rotation;
+
+                Vector3 position = this.transform.position;
+                position.y -= 0.12f;
+                this.transform.position = position;
+
+                GameUiManager.Instance.IngameUi.ShowAButton(_name);
+                SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._PreRevive, false);
+
+                _reviveCollider.enabled = false;
+            }
         }
         else if (collider.CompareTag("Enemy") && !IsDead)
         {
@@ -271,29 +293,6 @@ public class Player : MonoBehaviour
                 }
 
                 RemoveCurrentCard();
-            }
-        }
-        else if (collider.CompareTag("Player") && IsDead && _numDeaths < _numLives && !_revived)
-        {
-            Player otherPlayer = collider.GetComponent<Player>();
-
-            if (!otherPlayer.IsDead)
-            {
-                //IsDead = false;
-                _revived = true;
-
-                Vector3 rotation = this.transform.localEulerAngles;
-                rotation.z = 0;
-                this.transform.localEulerAngles = rotation;
-
-                Vector3 position = this.transform.position;
-                position.y -= 0.12f;
-                this.transform.position = position;
-
-                GameUiManager.Instance.IngameUi.ShowAButton(_name);
-                SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._PreRevive, false);
-
-                _reviveCollider.enabled = false;
             }
         }
         else if (collider.CompareTag("EnemyBehindPlayer") && !IsDead)
