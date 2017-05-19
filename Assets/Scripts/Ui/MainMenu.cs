@@ -38,10 +38,11 @@ public class MainMenu : MonoBehaviour
 
     public void OnLevelButtonPressed(int id)
     {
-        if(_levelNames.Count >= id)
+        if (_levelNames.Count >= id)
         {
             SceneManager.LoadScene(_levelNames[id]);
         }
+        SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._SelectMenuItem, false);
     }
 
     public void OnQuitButtonPressed()
@@ -50,6 +51,7 @@ public class MainMenu : MonoBehaviour
         UnityEditor.EditorApplication.isPlaying = false;
         #else
 		Application.Quit ();
+        SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._SelectMenuItem, false);
         #endif
     }
 
@@ -60,6 +62,7 @@ public class MainMenu : MonoBehaviour
 
         //_eventSystem.firstSelectedGameObject = _levelSelectionFirstSelected;
         _eventSystem.SetSelectedGameObject(_levelSelectionFirstSelected);
+        SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._SelectMenuItem, false);
     }
 
     public void OnBackToMainMenuButtonPressed()
@@ -69,5 +72,6 @@ public class MainMenu : MonoBehaviour
 
         //_eventSystem.firstSelectedGameObject = _mainMenuFirstSelected;
         _eventSystem.SetSelectedGameObject(_mainMenuFirstSelected);
+        SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._SelectMenuItem, false);
     }
 }

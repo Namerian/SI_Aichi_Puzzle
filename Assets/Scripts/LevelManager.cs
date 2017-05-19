@@ -77,6 +77,7 @@ public class LevelManager : MonoBehaviour
         if (!IsGamePaused && _players[0].IsDead && _players[1].IsDead)
         {
             IsGamePaused = true;
+            SoundManager.Instance.Stop(SoundManager.Instance._motorAudioSource);
             GameUiManager.Instance.ActivateGameOverPanel();
         }
 

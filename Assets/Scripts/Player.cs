@@ -113,6 +113,7 @@ public class Player : MonoBehaviour
             IsDead = false;
             _revived = false;
             GameUiManager.Instance.IngameUi.HideAButton(_name);
+            SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._Revive, false);
         }
         else if (IsDead && !_revived)
         {
@@ -207,6 +208,7 @@ public class Player : MonoBehaviour
         {
             Debug.Log(_name + "hit a wall!");
             _rigidbody.velocity = Vector3.zero;
+            SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._Lose, false);
 
             PlayerDown();
         }
@@ -216,6 +218,7 @@ public class Player : MonoBehaviour
             {
                 Debug.Log("TU MEURS!");
                 PlayerDown();
+                SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._HitEnemy, false);
             }
             else
             {
@@ -226,9 +229,11 @@ public class Player : MonoBehaviour
                 {
                     case CardResult.PlayerVictory:
                         enemy.gameObject.SetActive(false);
+                        SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._HitPlayer, false);
                         break;
                     case CardResult.EnemyVictory:
                         Debug.Log("TU MEURS!");
+                        SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._HitEnemy, false);
                         PlayerDown();
                         break;
                 }
@@ -250,6 +255,7 @@ public class Player : MonoBehaviour
                 this.transform.localEulerAngles = rotation;
 
                 GameUiManager.Instance.IngameUi.ShowAButton(_name);
+                SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._PreRevive, false);
             }
         }
         else if (collider.CompareTag("EnemyBehindPlayer") && !IsDead)

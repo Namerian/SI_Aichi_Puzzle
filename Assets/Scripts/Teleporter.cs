@@ -30,6 +30,8 @@ public class Teleporter : MonoBehaviour
     {
         if (_active && other.CompareTag("Player"))
         {
+            SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._Win, false);
+            SoundManager.Instance.Stop(SoundManager.Instance._motorAudioSource);
             SceneManager.LoadScene(_nextLevelName);
         }
     }

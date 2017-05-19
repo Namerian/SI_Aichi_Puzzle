@@ -63,6 +63,8 @@ public class GameUiManager : MonoBehaviour
         _gameOverPanel.Hide();
 
         _ingameUi.Activate();
+        SoundManager.Instance.PlaySound(SoundManager.Instance._musicAudioSource, SoundManager.Instance._GameMusic, true);
+        SoundManager.Instance.PlaySound(SoundManager.Instance._motorAudioSource, SoundManager.Instance._MotorSound, true);
     }
 
     public void ActivateGameOverPanel()
@@ -71,5 +73,6 @@ public class GameUiManager : MonoBehaviour
         _ingameUi.Hide();
 
         _gameOverPanel.Activate();
+        SoundManager.Instance.PlaySound(SoundManager.Instance._fxAudioSource, SoundManager.Instance._Lose, false);
     }
 }

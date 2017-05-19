@@ -27,6 +27,7 @@ public class GameOverPanel : MonoBehaviour
 
     public void OnQuitButtonPressed()
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance._musicAudioSource, SoundManager.Instance._MenuMusic, true);
         SceneManager.LoadScene("MenuScene");
     }
 
